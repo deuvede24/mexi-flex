@@ -1,0 +1,52 @@
+
+<div class="container mt-4">
+    <div class="card border-secondary">
+      <div class="card-header bg-primary text-white d-flex justify-content-between">
+        <h4>Listado de Recetas</h4>
+        <div>
+          <button class="btn btn-info me-2" (click)="downloadCSV()">Descargar CSV</button>
+          <button class="btn btn-success" (click)="addRecipe()">Añadir Ítem</button>
+        </div>
+      </div>
+      <div class="card-body">
+        <div class="table-responsive"> <!-- Asegurar que la tabla sea scrollable -->
+          <table class="table table-hover table-bordered">
+            <thead class="table-dark">
+              <tr>
+                <th scope="col">Título</th>
+                <th scope="col">Descripción</th>
+                <th scope="col">Pasos</th>
+                <th scope="col">Categoría</th>
+                <th scope="col">Premium</th>
+                <th scope="col">Ingredientes</th>
+                <th scope="col">Acciones</th>
+              </tr>
+            </thead>
+            <tbody>
+              @if (recipeList.length > 0) {
+                @for (recipe of recipeList; track recipe.id_recipe) {
+                  <tr class="table-dark">
+                    <td>{{ recipe.title }}</td>
+                    <td>{{ recipe.description }}</td>
+                    <td>{{ recipe.steps }}</td>
+                    <td>{{ recipe.category }}</td>
+                    <td>{{ recipe.is_premium ? 'Sí' : 'No' }}</td>
+                    <td>{{ recipe.ingredients }}</td>
+                    <td class="d-flex justify-content-around align-items-center">
+                      <button class="btn btn-info btn-sm" (click)="editRecipe(recipe.id_recipe)">Editar</button>
+                      <button class="btn btn-danger btn-sm ms-2" (click)="deleteRecipe(recipe.id_recipe)">Eliminar</button>
+                    </td>
+                  </tr>
+                }
+              } @else {
+                <tr>
+                  <td colspan="7" class="text-center">No hay recetas disponibles.</td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+  

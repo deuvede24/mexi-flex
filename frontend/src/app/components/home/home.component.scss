@@ -1,0 +1,108 @@
+// home.component.scss
+
+/*.container {
+    margin-top: 20px; // Ajusta el margen superior de todo el contenedor si es necesario
+    text-align: center; // Asegura que el texto esté centrado
+  
+    button {
+      margin: 0 10px; // Agrega un margen de 10px a los lados de cada botón
+      padding: 10px 20px; // Puedes ajustar el padding si quieres que los botones sean más grandes
+      font-size: 16px; // Ajusta el tamaño de la fuente según lo necesites
+    }
+  
+    .btn-primary {
+      background-color: #ffc107; // Color de fondo personalizado para el botón "Ver Recetas"
+      border-color: #ffc107; // Color de borde personalizado
+    }
+  
+    .btn-secondary {
+      background-color: #6c757d; // Color de fondo personalizado para el botón "Administrar Cuenta"
+      border-color: #6c757d; // Color de borde personalizado
+    }
+  
+    .btn-danger {
+      background-color: #e83e8c; // Color de fondo personalizado para el botón "Cerrar sesión"
+      border-color: #e83e8c; // Color de borde personalizado
+    }
+  }
+
+  .container {
+  margin-top: 50px; // Ajusta el margen superior si es necesario
+  text-align: center;
+
+  h1 {
+    font-size: 2.5rem;
+    margin-bottom: 20px;
+  }
+
+  p.lead {
+    font-size: 1.25rem;
+  }
+
+  .btn {
+    padding: 10px 20px;
+    font-size: 1rem;
+    transition: background-color 0.3s ease;
+  }
+
+  .btn:hover {
+    background-color: darken($color, 10%); // Ajusta el color al pasar el ratón por encima
+  }
+}*/
+
+// home.component.scss
+.container {
+    margin-top: 50px; // Ajusta el margen superior si es necesario
+    text-align: center;
+  
+    h1 {
+      font-size: 2.5rem;
+      margin-bottom: 20px;
+    }
+  
+    p.lead {
+      font-size: 1.25rem;
+      margin-top: 20px;
+    }
+  
+    .btn {
+      padding: 10px 20px;
+      font-size: 1rem;
+      margin: 0 10px; // Agrega un margen de 10px a los lados de cada botón
+      transition: background-color 0.3s ease;
+  
+      &.btn-primary {
+        background-color: #ffc107; // Color de fondo personalizado para el botón "Ver Recetas"
+        border-color: #ffc107; // Color de borde personalizado
+      }
+  
+      &.btn-secondary {
+        background-color: #6c757d; // Color de fondo personalizado para el botón "Administrar Cuenta"
+        border-color: #6c757d; // Color de borde personalizado
+      }
+  
+      &.btn-danger {
+        background-color: #e83e8c; // Color de fondo personalizado para el botón "Cerrar sesión"
+        border-color: #e83e8c; // Color de borde personalizado
+      }
+  
+      &:hover {
+        filter: brightness(90%); // Oscurece el botón al pasar el ratón por encima
+      }
+    }
+  
+    // Estilos específicos para pantallas pequeñas (móviles)
+    @media (max-width: 576px) {
+      .btn {
+        display: block; // Hace que cada botón ocupe una línea completa
+        width: 100%; // Asegura que el botón ocupe todo el ancho disponible
+        margin: 10px 0; // Añade margen vertical entre los botones
+      }
+  
+      .btn-link {
+        margin-top: 20px; // Espacio adicional para el enlace de "Entrar como invitado"
+      }
+    }
+  }
+
+  

@@ -1,0 +1,89 @@
+  <div class="container mt-4">
+    <div class="card border-primary mb-3">
+      <div class="card-header">
+        @if (id === 0) {
+          Agregar Receta
+        } @else {
+          Editar Receta
+        }
+      </div>
+      <div class="card-body text-primary">
+        <form [formGroup]="form" (ngSubmit)="saveRecipe()">
+          
+          <!-- Campo para el título -->
+          <div class="form-group">
+            <label for="title">Título</label>
+            <input formControlName="title" type="text" id="title" class="form-control" placeholder="Ingrese título">
+            @if (form.get('title')?.hasError('required') && form.get('title')?.touched) {
+              <span class="text-danger">
+                El campo título es <strong>requerido</strong>
+              </span>
+            }
+          </div>
+  
+          <!-- Campo para la descripción -->
+          <div class="form-group mt-3">
+            <label for="description">Descripción</label>
+            <input formControlName="description" type="text" id="description" class="form-control" placeholder="Ingrese descripción">
+            @if (form.get('description')?.hasError('required') && form.get('description')?.touched) {
+              <span class="text-danger">
+                El campo descripción es <strong>requerido</strong>
+              </span>
+            }
+          </div>
+  
+          <!-- Campo para los pasos -->
+          <div class="form-group mt-3">
+            <label for="steps">Pasos</label>
+            <textarea formControlName="steps" id="steps" class="form-control" placeholder="Ingrese pasos"></textarea>
+            @if (form.get('steps')?.hasError('required') && form.get('steps')?.touched) {
+              <span class="text-danger">
+                El campo pasos es <strong>requerido</strong>
+              </span>
+            }
+          </div>
+  
+          <!-- Campo para la categoría -->
+          <div class="form-group mt-3">
+            <label for="category">Categoría</label>
+            <select formControlName="category" id="category" class="form-control">
+              <option value="traditional">Traditional</option>
+              <option value="vegan">Vegan</option>
+              <option value="vegetarian">Vegetarian</option>
+            </select>
+            @if (form.get('category')?.hasError('required') && form.get('category')?.touched) {
+              <span class="text-danger">
+                El campo categoría es <strong>requerido</strong>
+              </span>
+            }
+          </div>
+  
+          <!-- Campo para los ingredientes -->
+          <div class="form-group mt-3">
+            <label for="ingredients">Ingredientes</label>
+            <textarea formControlName="ingredients" id="ingredients" class="form-control" placeholder="Ingrese ingredientes separados por comas"></textarea>
+            @if (form.get('ingredients')?.hasError('required') && form.get('ingredients')?.touched) {
+              <span class="text-danger">
+                El campo ingredientes es <strong>requerido</strong>
+              </span>
+            }
+          </div>
+  
+          <!-- Campo para marcar si es Premium -->
+          <div class="form-group mt-3">
+            <div class="form-check">
+              <input formControlName="is_premium" type="checkbox" id="is_premium" class="form-check-input">
+              <label for="is_premium" class="form-check-label">Es Premium</label>
+            </div>
+          </div>
+  
+          <!-- Botones de acción -->
+          <div class="mt-4 d-flex justify-content-between">
+            <button type="button" class="btn btn-secondary" (click)="cancel()">Cancelar</button>
+            <button [disabled]="form.invalid" type="submit" class="btn btn-primary">Aceptar</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+  

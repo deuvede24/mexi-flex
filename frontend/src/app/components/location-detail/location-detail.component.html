@@ -1,0 +1,30 @@
+
+  <div class="location-detail">
+    <h2>Detalles de la Ubicación</h2>
+
+    <!-- Validamos si hay una ubicación seleccionada -->
+    @if (location) {
+        <p><strong>Nombre:</strong> {{ location.name }}</p>
+        <p><strong>Descripción:</strong> {{ location.description }}</p>
+        <p><strong>Latitud:</strong> {{ location.latitude }}</p>
+        <p><strong>Longitud:</strong> {{ location.longitude }}</p>
+        <p><strong>Category:</strong> {{ location.category }}</p>
+  
+        <div class="button-group">
+            <!-- Botón para editar la ubicación -->
+            <button class="btn btn-warning" (click)="editLocation()">Editar</button>
+            <!-- Botón para eliminar la ubicación -->
+            <button class="btn btn-danger" (click)="deleteLocation()">Eliminar</button>
+        </div>
+
+       
+    } @else {
+        <!-- Si no hay una ubicación seleccionada, mostramos un mensaje -->
+        <p>No se ha seleccionado ninguna ubicación.</p>
+    }
+</div>
+
+  
+
+  
+  

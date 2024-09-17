@@ -1,0 +1,61 @@
+<div class="container mt-4">
+    <div class="card border-primary mb-3">
+      <div class="card-header">
+        {{ isEditMode ? 'Editar Ubicación' : 'Añadir Nueva Ubicación' }}
+      </div>
+      <div class="card-body text-primary">
+        <form [formGroup]="form" (ngSubmit)="saveLocation()">
+          <div class="form-group">
+            <label for="name">Nombre</label>
+            <input formControlName="name" type="text" id="name" class="form-control" placeholder="Ingrese nombre">
+            @if (form.get('name')?.hasError('required') && form.get('name')?.touched) {
+              <span class="text-danger">
+                El campo nombre es <strong>requerido</strong>
+              </span>
+            }
+          </div>
+  
+          <div class="form-group mt-3">
+            <label for="description">Descripción</label>
+            <textarea formControlName="description" id="description" class="form-control" placeholder="Ingrese descripción"></textarea>
+          </div>
+  
+          <div class="form-group mt-3">
+            <label for="latitude">Latitud</label>
+            <input formControlName="latitude" type="number" id="latitude" class="form-control" placeholder="Ingrese latitud">
+            @if (form.get('latitude')?.hasError('required') && form.get('latitude')?.touched) {
+              <span class="text-danger">
+                El campo latitud es <strong>requerido</strong>
+              </span>
+            }
+          </div>
+  
+          <div class="form-group mt-3">
+            <label for="longitude">Longitud</label>
+            <input formControlName="longitude" type="number" id="longitude" class="form-control" placeholder="Ingrese longitud">
+            @if (form.get('longitude')?.hasError('required') && form.get('longitude')?.touched) {
+              <span class="text-danger">
+                El campo longitud es <strong>requerido</strong>
+              </span>
+            }
+          </div>
+
+          <div class="form-group mt-3">
+            <label for="category">Categoría</label>
+            <select formControlName="category" id="category" class="form-control">
+              <option value="">Seleccione una categoría</option>
+              <option value="restaurant">Restaurante</option>
+              <option value="museum">Museo</option>
+              <option value="park">Parque</option>
+            </select>
+          </div>
+  
+          <div class="mt-4 d-flex justify-content-between">
+            <button type="button" class="btn btn-secondary" (click)="router.navigate(['/locations'])">Cancelar</button>
+            <button [disabled]="form.invalid" type="submit" class="btn btn-primary">Aceptar</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+  

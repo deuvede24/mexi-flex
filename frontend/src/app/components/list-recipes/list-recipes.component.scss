@@ -1,0 +1,21 @@
+// Estilos adicionales para asegurar buena visibilidad en pantallas pequeñas
+// Estilos responsivos adicionales
+@media (max-width: 576px) {
+    .table-responsive {
+      overflow-x: auto; // Asegura el scroll horizontal en pantallas pequeñas
+    }
+  
+    .table td, .table th {
+      white-space: nowrap; // Evita que el texto se corte y se ajuste en una línea
+    }
+  
+    .btn {
+      font-size: 12px; // Ajustar el tamaño de los botones
+      padding: 5px 8px; // Reducir el padding de los botones
+    }
+  
+    .card-header, .table th, .table td {
+      font-size: 12px; // Reducir el tamaño de fuente para mejor ajuste
+    }
+  }
+  

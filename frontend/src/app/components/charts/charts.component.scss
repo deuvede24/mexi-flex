@@ -1,0 +1,19 @@
+.charts-container {
+    h2 {
+      color: white;
+      text-align: center;
+      margin-bottom: 20px;
+    }
+  
+    canvas {
+      display: block;
+      margin: 0 auto;
+      max-width: 900px;  // Aumentamos el tamaño máximo de los gráficos.
+      height: 400px;     // Ajustamos la altura de los gráficos.
+    }
+  
+    #barChart, #doughnutChart, #pieChart {
+      margin-bottom: 50px;  // Ajustamos el espacio entre los gráficos.
+    }
+  }
+  

@@ -1,0 +1,29 @@
+
+<div id="map" style="width: 100%; height: 100vh;"></div>
+
+<!-- Mostrar el panel de detalles si hay una ubicación seleccionada -->
+@if (selectedLocation) {
+  <div class="location-detail-panel visible">
+    <app-location-detail [location]="selectedLocation"></app-location-detail>
+    
+    <!-- Botón de cerrar con la X -->
+    <button class="close-panel-btn" (click)="closePanel()">&#10006;</button> <!-- X para cerrar -->
+  </div>
+}
+<div id="mapLegend" style="position: absolute; bottom: 10px; left: 10px; background-color: rgba(255, 255, 255, 0.8); padding: 5px; border-radius: 5px; z-index: 1000;">
+  Haz doble clic para añadir una ubicación
+</div>
+
+<div id="mapLegend" style="position: absolute; bottom: 10px; left: 10px; background-color: rgba(255, 255, 255, 0.8); padding: 5px; border-radius: 5px; z-index: 1000;">
+  <p>Haz doble clic para añadir una ubicación</p>
+  
+  <!-- Filtros de categorías -->
+  <div>
+    <p><strong>Filtrar por categoría:</strong></p>
+    <label><input type="checkbox" value="restaurant" (change)="filterMarkers($event)"> Restaurantes</label><br>
+    <label><input type="checkbox" value="museum" (change)="filterMarkers($event)"> Museos</label><br>
+    <label><input type="checkbox" value="park" (change)="filterMarkers($event)"> Parques</label><br>
+    <!-- Agrega más categorías según sea necesario -->
+  </div>
+</div>
+

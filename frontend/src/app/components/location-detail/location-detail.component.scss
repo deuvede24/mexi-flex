@@ -1,0 +1,56 @@
+/* Aquí pueden ir los estilos específicos de los detalles de la ubicación,
+pero no los estilos del panel que ya están en `map.component.scss`. */
+
+/* Ejemplo de estilo que podría estar aquí */
+.location-detail {
+    padding: 20px;
+  
+    h2 {
+      color: #333;
+      margin-bottom: 10px;
+    }
+  
+    p {
+      margin-bottom: 8px;
+    }
+  
+    .button-group {
+      margin-top: 20px;
+    }
+    .button-group button {
+        margin-right: 10px; /* Espacio entre los botones */
+      }
+      
+      .button-group button:last-child {
+        margin-right: 0; /* No aplicar margen al último botón */
+      }
+  }
+  
+  
+
+
+  
+    /*h2 {
+      margin-top: 0;
+    }
+  
+    button {
+      margin-top: 10px;
+    }
+  
+    .button-group {
+      display: flex;
+      justify-content: space-between;
+      margin-top: 20px;
+    }
+  
+    .button-group button {
+      flex: 1;
+      margin-right: 10px;
+    }
+  
+    .button-group button:last-child {
+      margin-right: 0;
+    }
+  }*/
+    

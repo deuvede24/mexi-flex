@@ -1,0 +1,23 @@
+.navbar {
+  padding: 25px;
+
+  .navbar-brand {
+    margin-right: 20px; // Asegura que haya espacio entre "CRUD Recetas" y el primer enlace del menú
+  }
+
+  .navbar-nav {
+    margin-left: 0; // Elimina cualquier margen adicional
+  }
+
+  .nav-link {
+    color: #fff;
+    padding: 10px 15px;
+    &:hover {
+      color: #ffc107;  // Color amarillo cuando se pasa el ratón por encima
+    }
+  }
+
+  .form-control {
+    margin-right: 15px;
+  }
+}
