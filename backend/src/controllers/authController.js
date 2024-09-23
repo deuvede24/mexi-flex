@@ -23,7 +23,7 @@ export const register = async (req, res) => {
       return res.status(400).json({ errors: errors.array() });
     }
 
-    const { email, password, name, surname, location, preference, avatar } = req.body;
+    const { email, password, username,avatar } = req.body;
 
     // Verificar si ya existe un usuario con el mismo correo electrónico
     const existingUser = await User.findOne({ where: { email }});
@@ -42,11 +42,8 @@ export const register = async (req, res) => {
     const newUser = new User({
       email,
       password: hashedPassword,
-      name,
-      surname,
+      username,
       roles:'user',
-      location,
-      preference,
       avatar,
       status: 1
     });
@@ -55,7 +52,7 @@ export const register = async (req, res) => {
     console.log("Nuevo usuario creado:", newUser); // Log del nuevo usuario creado
 
     // Generar un token de acceso y lo guardo en un token seguro (httpOnly)
-    const accessToken = jwt.sign({ id_user: newUser.id_user, name: newUser.name }, process.env.JWT_SECRET);
+    const accessToken = jwt.sign({ id_user: newUser.id_user, username: newUser.username }, process.env.JWT_SECRET);
     console.log("Token generado:", accessToken); // Log del token generado
 
     const token = serialize('token', accessToken, {
@@ -75,8 +72,7 @@ export const register = async (req, res) => {
       user: {
         id_user: newUser.id_user,
         email: newUser.email,
-        name: newUser.name,
-        surname: newUser.surname,
+        username: newUser.username,
         roles: newUser.roles
       }
     });
@@ -256,8 +252,7 @@ export const login = async (req, res) => {
       user: {
         id_user: user.id_user,
         email: user.email,
-        name: user.name,
-        surname: user.surname,
+        username: user.username,
         roles: user.roles,
       },
     });
@@ -377,7 +372,7 @@ export const changePassword = async (req, res) => {
     })
 
     // Generar un token de acceso y lo guardo en un token seguro (httpOnly)
-    const accessToken = jwt.sign({ id_user: user.id_user, name: user.name }, process.env.JWT_SECRET);
+    const accessToken = jwt.sign({ id_user: user.id_user, username: user.username }, process.env.JWT_SECRET);
     const token_jwt = serialize('token', accessToken, {
       httpOnly: true,
       secure: process.env.NODE_ENV === 'production',
@@ -393,8 +388,7 @@ export const changePassword = async (req, res) => {
       message: 'User Detail',
       data: {
         user: {
-          name: user.name,
-          surname: user.surname,
+          username: user.username,
           email: user.email
         } 
       }

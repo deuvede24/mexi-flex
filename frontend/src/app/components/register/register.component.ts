@@ -30,8 +30,9 @@ export class RegisterComponent implements OnInit {
 
 
     this.registerForm = this.formBuilder.group({
-      name: ['', [Validators.required, Validators.pattern(/^[a-zA-ZÀ-ÿ\u00f1\u00d1 ]+$/)]],
-      surname: ['', [Validators.required, Validators.pattern(/^[a-zA-ZÀ-ÿ\u00f1\u00d1 ]+$/)]],
+      username: ['', [Validators.required, Validators.pattern(/^[a-zA-Z0-9_]+$/)]],
+      //name: ['', [Validators.required, Validators.pattern(/^[a-zA-ZÀ-ÿ\u00f1\u00d1 ]+$/)]],
+      //surname: ['', [Validators.required, Validators.pattern(/^[a-zA-ZÀ-ÿ\u00f1\u00d1 ]+$/)]],
       email: ['', [Validators.required, Validators.email]],
       password: ['', [Validators.required, Validators.minLength(6)]],
       confirmPassword: ['', [Validators.required]]
@@ -67,9 +68,9 @@ export class RegisterComponent implements OnInit {
     }
     console.log(this.registerForm.value);
 
-    const { name, surname, email, password } = this.registerForm.value;
+    const { username, email, password } = this.registerForm.value;
 
-    this.authService.register({ name, surname, email, password }).subscribe({
+    this.authService.register({username, email, password }).subscribe({
       next: (response: AuthResponse) => {  //AuthResponse correctamente definido
         if (response && response.user) {
 

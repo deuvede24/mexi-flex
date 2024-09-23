@@ -39,7 +39,7 @@ router.post('/', authenticateToken(['user', 'admin']), recipeValidator, addRecip
 router.put('/:id', authenticateToken(['user', 'admin']), idValidator, recipeValidator, updateRecipe);
 router.patch('/:id', authenticateToken(['user', 'admin']), idValidator, recipeValidatorPatch, updateRecipe);
 
-router.delete('/:id', authenticateToken(['user','admin']), idValidator, deleteRecipe);
+router.delete('/:id', authenticateToken(['admin']), idValidator, deleteRecipe);
 
 // Ruta accesible para todos para obtener las recetas
 router.get('/', getRecipes);

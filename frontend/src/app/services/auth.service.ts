@@ -67,14 +67,14 @@ export class AuthService {
   }
 
 
-  getFullName(): string {
+  /*getFullName(): string {
     if (this.currentUser) {
       const name = this.currentUser.name || 'Invitado';
       const surname = this.currentUser.surname || '';
       return `${name} ${surname}`.trim();
     }
     return 'Invitado';
-  }
+  }*/
 
   logout(): void {
     localStorage.removeItem('token');
@@ -87,8 +87,9 @@ export class AuthService {
       id_user: 0,
       email: 'guest@example.com',
       role: 'guest',
-      name: 'Guest',
-      surname: 'User'
+      // name: 'Guest',
+      //surname: 'User'
+      username: 'Guest'
     };
     this.currentUser = guestUser;
     localStorage.setItem('user', JSON.stringify(guestUser));

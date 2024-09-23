@@ -29,10 +29,13 @@ export const authenticateToken = (allowedRoles) => async (req, res, next) => {
         message: "Token de acceso no válido",
       });
     }
+// Asegurarse de que 'roles' sea un array
+/*const userRoles = Array.isArray(user.roles) ? user.roles : user.roles.split(',');
 
-    const hasPermission = user.roles.some((role) =>
-      allowedRoles.includes(role)
-    );
+const hasPermission = userRoles.some((role) => allowedRoles.includes(role));*/
+const hasPermission = allowedRoles.includes(user.roles);
+
+
     if (!hasPermission) {
       return res.status(403).json({
         code: -10,

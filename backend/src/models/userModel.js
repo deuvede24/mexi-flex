@@ -13,21 +13,17 @@ const User = sequelize.define(
     email: {
       type: DataTypes.STRING(100),
       allowNull: false,
-    //  unique: true,
+      //  unique: true,
     },
     password: {
       type: DataTypes.STRING(100),
       allowNull: false,
     },
-    name: {
+    username: {
       type: DataTypes.STRING(30),
       allowNull: false,
     },
-    surname: {
-      type: DataTypes.STRING(30),
-      allowNull: true,
-    },
-    roles: {
+     /*roles: {
       type: DataTypes.STRING(30),
       allowNull: false,
       get() {
@@ -37,9 +33,7 @@ const User = sequelize.define(
         }
         return rawValue.split(",");
       },
-      /*set(value) {
-        this.setDataValue("roles", value.join(","));
-      },*/
+  
       set(value) {
         if (Array.isArray(value)) {
             this.setDataValue('roles', value.join(','));
@@ -49,26 +43,21 @@ const User = sequelize.define(
         
     },
     
-    },
-    photo: {
+    },*/
+    roles: {
       type: DataTypes.STRING(30),
-      allowNull: true,
+      allowNull: false,
+      defaultValue: "user",
     },
-    location: {
-      type: DataTypes.STRING(60),
-      allowNull: true,
-    },
-    preference: {
-      type: DataTypes.ENUM("original", "vegan", "vegetarian"),
-      allowNull: true,
-    },
+
     avatar: {
-      type: DataTypes.STRING(100),
+      // Puede ser la ruta de la imagen subida o la URL generada por la API
+      type: DataTypes.STRING(255),
       allowNull: true,
     },
   },
   {
-    tableName: 'users',
+    tableName: "users",
     indexes: [{ unique: true, fields: ["email"] }],
     timestamps: true,
     updatedAt: "updated_at",

@@ -21,11 +21,11 @@ const Recipe = sequelize.define('Recipe', {
     allowNull: false
   },
   steps: {
-    type: DataTypes.TEXT,
-    allowNull: false
+    type: DataTypes.JSON,
+    allowNull: false,
   },
   category: {
-    type: DataTypes.ENUM('traditional', 'vegan', 'vegetarian'),
+    type: DataTypes.ENUM('traditional', 'flexi'),
     allowNull: false
   },
   is_premium: {
@@ -34,9 +34,24 @@ const Recipe = sequelize.define('Recipe', {
     defaultValue: 0
   },
   ingredients: {
-    type: DataTypes.TEXT, // Añadimos la columna para almacenar los ingredientes directamente
+    type: DataTypes.JSON,
     allowNull: false,
+  },
+  image: {
+    type: DataTypes.STRING(255),
+    allowNull: true,  // Por si acaso no todas las recetas tienen imagen
+  },
+  serving_size: {
+    type: DataTypes.INTEGER,
+    allowNull: false,
+    defaultValue: 1  // Si hemos decidido usar 1 como el valor por defecto
+  },
+  preparation_time: {
+    type: DataTypes.INTEGER,
+    allowNull: false,
+    defaultValue: 0  // Tiempo en minutos
   }
+  
 }, {
   
   indexes: [{ unique: true, fields: ['title'] }],

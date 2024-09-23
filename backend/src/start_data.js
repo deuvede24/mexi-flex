@@ -12,55 +12,78 @@ const insertInitialData = async () => {
     parseInt(process.env.BCRYPT_SALT)
   );
 
-  const userData = [
+   // Insertar usuarios
+   const userData = [
     {
       email: "admin@example.com",
       password: hashedPassword,
-      name: "Admin",
-      surname: "User",
-      roles: ["admin"],
-      photo: null,
-      location: "Location1",
-      preference: "original",
-      avatar: null,
+      username: "admin",
+      roles: "admin",
+      avatar: null, // URL de avatar opcional
     },
     {
       email: "user@example.com",
       password: hashedPassword,
-      name: "User",
-      surname: "Example",
-      roles: ["user"],
-      photo: null,
-      location: "Location2",
-      preference: "vegan",
-      avatar: null,
+      username: "user",
+      roles: "user",
+      avatar: null, // URL de avatar opcional
     },
   ];
 
   await User.bulkCreate(userData, { ignoreDuplicates: true });
+  console.log("Usuarios insertados correctamente.");
 
+  // Insertar recetas
   const recipeData = [
     {
-      user_id: 1,
-      title: "Spaghetti Bolognese",
-      description: "A classic Italian pasta dish with a rich, savory sauce.",
-      steps: "Cook spaghetti, prepare sauce, mix together",
-      category: "traditional",
-      ingredients: "Spaghetti, Tomato Sauce, Ground Beef", // Ingredientes como texto
+      title: "Tacos de Tofu",
+      description: "Deliciosos tacos veganos hechos con tofu marinado y verduras frescas.",
+      steps: JSON.stringify([
+        "Marinar el tofu con salsa de soja, ajo y limón.",
+        "Freír el tofu y mezclar con las verduras frescas.",
+        "Servir con tortillas calientes."
+      ]),
+      category: "flexi",
+      ingredients: JSON.stringify([
+        { nombre: "Tofu", cantidad: "200g" },
+        { nombre: "Salsa de soja", cantidad: "2 cucharadas" },
+        { nombre: "Ajo", cantidad: "2 dientes" },
+        { nombre: "Limón", cantidad: "1 unidad" },
+        { nombre: "Verduras frescas", cantidad: "al gusto" },
+        { nombre: "Tortillas", cantidad: "4 unidades" }
+      ]),
+      serving_size: 2,
+      preparation_time: 20,
       is_premium: 0,
+      image: null // Aquí podrías añadir la URL o el nombre del archivo de la imagen si tienes
     },
     {
-      user_id: 2,
-      title: "Chicken Salad",
-      description: "A fresh and healthy salad with grilled chicken.",
-      steps: "Cook chicken, mix ingredients, add dressing",
-      category: "traditional",
-      ingredients: "Lettuce, Tomatoes, Chicken, Dressing", // Ingredientes como texto
+      title: "Ensalada de Quinoa",
+      description: "Ensalada saludable con quinoa, verduras frescas y aderezo de limón.",
+      steps: JSON.stringify([
+        "Cocinar la quinoa según las instrucciones del paquete.",
+        "Picar el pepino, tomate y cebolla en trozos pequeños.",
+        "Mezclar la quinoa cocida con las verduras.",
+        "Añadir jugo de limón, aceite de oliva y sal al gusto.",
+        "Refrigerar durante 15 minutos antes de servir."
+      ]),
+      category: "flexi",
+      ingredients: JSON.stringify([
+        { nombre: "Quinoa", cantidad: "200g" },
+        { nombre: "Pepino", cantidad: "1 unidad" },
+        { nombre: "Tomate", cantidad: "2 unidades" },
+        { nombre: "Cebolla", cantidad: "1/2 unidad" },
+        { nombre: "Limón", cantidad: "1 unidad" },
+        { nombre: "Aceite de oliva", cantidad: "2 cucharadas" },
+        { nombre: "Sal", cantidad: "al gusto" }
+      ]),
+      serving_size: 2,
+      preparation_time: 50,
       is_premium: 0,
+      image: null // Aquí podrías añadir la URL o el nombre del archivo de la imagen si tienes
     },
   ];
 
-  // Crear recetas
   await Recipe.bulkCreate(recipeData, { ignoreDuplicates: true });
   console.log("Recetas insertadas correctamente.");
 

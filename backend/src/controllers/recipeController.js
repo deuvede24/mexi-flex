@@ -160,32 +160,57 @@ export const updateRecipe = async (req, res) => {
     }
 
     const { id } = req.params;
+    console.log(`Buscando la receta con ID: ${id}`);
     const recipe = await Recipe.findByPk(id);
 
     if (!recipe) {
+      console.log(`Receta no encontrada con ID: ${id}`);
       return res.status(404).json({
         code: -3,
         message: "Recipe not found",
       });
     }
 
+    console.log(`Datos recibidos para la actualización: ${JSON.stringify(req.body)}`);
+
     // Aquí permitimos actualizaciones parciales usando el operador spread
-    const {
+    /*const {
       title = recipe.title, // Si no se envía un campo, se conserva el valor actual
       description = recipe.description,
       steps = recipe.steps,
       category = recipe.category,
       is_premium = recipe.is_premium,
       ingredients = recipe.ingredients,
+    } = req.body;*/
+    const {
+      title = recipe.title,
+      description = recipe.description,
+      steps = recipe.steps,
+      category = recipe.category,
+      is_premium = recipe.is_premium,
+      ingredients = recipe.ingredients,
+      serving_size = recipe.serving_size,  // Nuevo campo
+      preparation_time = recipe.preparation_time,  // Nuevo campo
+      image = recipe.image  // Nuevo campo
     } = req.body;
 
+
     // Actualizar los campos de la receta
+    /*recipe.title = title;
+    recipe.description = description;
+    recipe.steps = steps;
+    recipe.category = category;
+    recipe.is_premium = is_premium;
+    recipe.ingredients = ingredients;*/
     recipe.title = title;
     recipe.description = description;
     recipe.steps = steps;
     recipe.category = category;
     recipe.is_premium = is_premium;
     recipe.ingredients = ingredients;
+    recipe.serving_size = serving_size;  // Actualización del nuevo campo
+    recipe.preparation_time = preparation_time;  // Actualización del nuevo campo
+    recipe.image = image;  // Actualización del nuevo campo
 
     await recipe.save();
 

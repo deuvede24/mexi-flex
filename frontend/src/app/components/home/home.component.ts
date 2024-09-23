@@ -25,7 +25,7 @@ export class HomeComponent implements OnInit {
   }
 
  
-    getFullName(): string {
+    /*getFullName(): string {
       if (this.authService.currentUser) {
         const name = this.authService.currentUser.name || '';
         const surname = this.authService.currentUser.surname || '';
@@ -38,7 +38,12 @@ export class HomeComponent implements OnInit {
         return `${name} ${surname}`.trim();
       }
       return 'Invitado';
-    }
+    }*/
+
+      getUsername(): string {
+        return this.authService.currentUser?.username || 'Invitado';
+      }
+      
 
 
   goToRecipes(): void {
