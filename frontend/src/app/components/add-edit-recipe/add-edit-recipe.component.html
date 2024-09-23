@@ -1,4 +1,4 @@
-  <div class="container mt-4">
+<!-- <div class="container mt-4">
     <div class="card border-primary mb-3">
       <div class="card-header">
         @if (id === 0) {
@@ -10,7 +10,6 @@
       <div class="card-body text-primary">
         <form [formGroup]="form" (ngSubmit)="saveRecipe()">
           
-          <!-- Campo para el título -->
           <div class="form-group">
             <label for="title">Título</label>
             <input formControlName="title" type="text" id="title" class="form-control" placeholder="Ingrese título">
@@ -21,7 +20,7 @@
             }
           </div>
   
-          <!-- Campo para la descripción -->
+        
           <div class="form-group mt-3">
             <label for="description">Descripción</label>
             <input formControlName="description" type="text" id="description" class="form-control" placeholder="Ingrese descripción">
@@ -32,7 +31,7 @@
             }
           </div>
   
-          <!-- Campo para los pasos -->
+      
           <div class="form-group mt-3">
             <label for="steps">Pasos</label>
             <textarea formControlName="steps" id="steps" class="form-control" placeholder="Ingrese pasos"></textarea>
@@ -43,7 +42,7 @@
             }
           </div>
   
-          <!-- Campo para la categoría -->
+        
           <div class="form-group mt-3">
             <label for="category">Categoría</label>
             <select formControlName="category" id="category" class="form-control">
@@ -58,7 +57,7 @@
             }
           </div>
   
-          <!-- Campo para los ingredientes -->
+         
           <div class="form-group mt-3">
             <label for="ingredients">Ingredientes</label>
             <textarea formControlName="ingredients" id="ingredients" class="form-control" placeholder="Ingrese ingredientes separados por comas"></textarea>
@@ -69,7 +68,7 @@
             }
           </div>
   
-          <!-- Campo para marcar si es Premium -->
+        
           <div class="form-group mt-3">
             <div class="form-check">
               <input formControlName="is_premium" type="checkbox" id="is_premium" class="form-check-input">
@@ -77,7 +76,7 @@
             </div>
           </div>
   
-          <!-- Botones de acción -->
+          
           <div class="mt-4 d-flex justify-content-between">
             <button type="button" class="btn btn-secondary" (click)="cancel()">Cancelar</button>
             <button [disabled]="form.invalid" type="submit" class="btn btn-primary">Aceptar</button>
@@ -85,5 +84,130 @@
         </form>
       </div>
     </div>
+  </div>-->
+<div class="container mt-4">
+  <div class="card border-primary mb-3">
+    <div class="card-header">
+      @if (id === 0) {
+      Agregar Receta
+      } @else {
+      Editar Receta
+      }
+    </div>
+    <div class="card-body text-primary">
+      <form [formGroup]="form" (ngSubmit)="saveRecipe()">
+
+        <!-- Campo para el título -->
+        <div class="form-group">
+          <label for="title">Título</label>
+          <input formControlName="title" type="text" id="title" class="form-control" placeholder="Ingrese título">
+          @if (form.get('title')?.hasError('required') && form.get('title')?.touched) {
+          <span class="text-danger">
+            El campo título es <strong>requerido</strong>
+          </span>
+          }
+        </div>
+
+        <!-- Campo para la descripción -->
+        <div class="form-group mt-3">
+          <label for="description">Descripción</label>
+          <input formControlName="description" type="text" id="description" class="form-control"
+            placeholder="Ingrese descripción">
+          @if (form.get('description')?.hasError('required') && form.get('description')?.touched) {
+          <span class="text-danger">
+            El campo descripción es <strong>requerido</strong>
+          </span>
+          }
+        </div>
+        <div class="form-group mt-3">
+          <label for="ingredients">Ingredientes</label>
+          <div formArrayName="ingredients">
+            @for (ingredient of getIngredients().controls; track $index) {
+            <div [formGroupName]="$index" class="d-flex mb-2">
+              <!-- Nombre del ingrediente -->
+              <input formControlName="nombre" class="form-control mr-2" placeholder="Ingrediente" />
+
+              <!-- Cantidad en imperial -->
+              <input formControlName="cantidadImperial" class="form-control mr-2"
+                placeholder="Cantidad Imperial (ej: 1 taza)" />
+
+              <!-- Cantidad en métrico -->
+              <input formControlName="cantidadMetric" class="form-control mr-2"
+                placeholder="Cantidad Métrico (ej: 200 gramos)" />
+
+              <button type="button" class="btn btn-danger" (click)="removeIngredient($index)">Eliminar</button>
+            </div>
+            }
+          </div>
+          <button type="button" class="btn btn-primary mt-2" (click)="addIngredient()">Añadir Ingrediente</button>
+        </div>
+
+
+        <!-- Pasos dinámicos -->
+        <div class="form-group mt-3">
+          <label for="steps">Pasos</label>
+          <div formArrayName="steps">
+            @for (step of getSteps().controls; track $index) {
+            <div [formGroupName]="$index" class="d-flex mb-2">
+              <textarea formControlName="descripcion" class="form-control mr-2"
+                placeholder="Descripción del paso"></textarea>
+              <button type="button" class="btn btn-danger" (click)="removeStep($index)">Eliminar</button>
+            </div>
+            }
+          </div>
+          <button type="button" class="btn btn-primary mt-2" (click)="addStep()">Añadir Paso</button>
+        </div>
+
+        <!-- Campo para la categoría -->
+        <div class="form-group mt-3">
+          <label for="category">Categoría</label>
+          <select formControlName="category" id="category" class="form-control">
+            <option value="traditional">Traditional</option>
+            <option value="flexi">Flexi</option> <!-- Agregué Flexi ya que vi que lo usas en la BD -->
+          </select>
+          @if (form.get('category')?.hasError('required') && form.get('category')?.touched) {
+          <span class="text-danger">
+            El campo categoría es <strong>requerido</strong>
+          </span>
+          }
+        </div>
+
+        <!-- Campo para marcar si es Premium -->
+        <div class="form-group mt-3">
+          <div class="form-check">
+            <input formControlName="is_premium" type="checkbox" id="is_premium" class="form-check-input">
+            <label for="is_premium" class="form-check-label">Es Premium</label>
+          </div>
+        </div>
+
+        <!-- Campo para el tamaño de porción -->
+        <div class="form-group mt-3">
+          <label for="serving_size">Tamaño de porción</label>
+          <input formControlName="serving_size" type="number" id="serving_size" class="form-control"
+            placeholder="Número de porciones">
+        </div>
+
+        <!-- Campo para el tiempo de preparación -->
+        <div class="form-group mt-3">
+          <label for="preparation_time">Tiempo de preparación (en minutos)</label>
+          <input formControlName="preparation_time" type="number" id="preparation_time" class="form-control"
+            placeholder="Tiempo en minutos">
+        </div>
+
+        <!-- Campo para la imagen -->
+        <div class="form-group mt-3">
+          <label for="image">URL de la imagen</label>
+          <input formControlName="image" type="text" id="image" class="form-control"
+            placeholder="Ingrese la URL de la imagen">
+        </div>
+
+        <!-- Botones de acción -->
+        <div class="mt-4 d-flex justify-content-between">
+          <button type="button" class="btn btn-secondary" (click)="cancel()">Cancelar</button>
+          <button [disabled]="form.invalid" type="submit" class="btn btn-primary">Aceptar</button>
+        </div>
+
+      </form>
+    </div>
   </div>
-  
+</div>
