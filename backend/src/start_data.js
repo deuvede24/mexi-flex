@@ -11,9 +11,10 @@ const insertInitialData = async () => {
     "password123",
     parseInt(process.env.BCRYPT_SALT)
   );
+  // const hashedPassword2 = await bcrypt.hash("111111", 10);; // Para los usuarios con contraseña "111111"
+  // Insertar usuarios
 
-   // Insertar usuarios
-   const userData = [
+  const userData = [
     {
       email: "admin@example.com",
       password: hashedPassword,
@@ -30,19 +31,18 @@ const insertInitialData = async () => {
     },
     {
       email: "carolina@gmail.com",
-      password: '111111',
-      username: "user",
+      password: hashedPassword,
+      username: "carol",
       roles: "user",
       avatar: null, // URL de avatar opcional
     },
     {
       email: "dogbark@gmail.com",
-      password: '111111',
-      username: "user",
+      password: hashedPassword,
+      username: "dog",
       roles: "user",
       avatar: null, // URL de avatar opcional
     },
-    
   ];
 
   await User.bulkCreate(userData, { ignoreDuplicates: true });
@@ -52,50 +52,85 @@ const insertInitialData = async () => {
   const recipeData = [
     {
       title: "Tacos de Tofu",
-      description: "Deliciosos tacos veganos hechos con tofu marinado y verduras frescas.",
-      steps: JSON.stringify([
-        "Marinar el tofu con salsa de soja, ajo y limón.",
-        "Freír el tofu y mezclar con las verduras frescas.",
-        "Servir con tortillas calientes."
-      ]),
+      description:
+        "Deliciosos tacos veganos hechos con tofu marinado y verduras frescas.",
+      steps: [
+        { descripcion: "Marinar el tofu con salsa de soja, ajo y limón." },
+        { descripcion: "Freír el tofu y mezclar con las verduras frescas." },
+        { descripcion: "Servir con tortillas calientes." }
+      ],
       category: "flexi",
-      ingredients: JSON.stringify([
+      ingredients: [
         { nombre: "Tofu", cantidad: { imperial: "8 oz", metric: "200g" } },
-        { nombre: "Salsa de soja", cantidad: { imperial: "2 tbsp", metric: "30ml" } },
-        { nombre: "Ajo", cantidad: { imperial: "2 cloves", metric: "2 dientes" } },
-        { nombre: "Limón", cantidad: { imperial: "1 unit", metric: "1 unidad" } },
-        { nombre: "Verduras frescas", cantidad: { imperial: "to taste", metric: "al gusto" } },
-        { nombre: "Tortillas", cantidad: { imperial: "4 units", metric: "4 unidades" } }
-      ]),
+        {
+          nombre: "Salsa de soja",
+          cantidad: { imperial: "2 tbsp", metric: "30ml" },
+        },
+        {
+          nombre: "Ajo",
+          cantidad: { imperial: "2 cloves", metric: "2 dientes" },
+        },
+        {
+          nombre: "Limón",
+          cantidad: { imperial: "1 unit", metric: "1 unidad" },
+        },
+        {
+          nombre: "Verduras frescas",
+          cantidad: { imperial: "to taste", metric: "al gusto" },
+        },
+        {
+          nombre: "Tortillas",
+          cantidad: { imperial: "4 units", metric: "4 unidades" },
+        },
+      ],
       serving_size: 1,
       preparation_time: 20,
       is_premium: 0,
-      image: null // Aquí podrías añadir la URL o el nombre del archivo de la imagen si tienes
+      image: null, // Aquí podrías añadir la URL o el nombre del archivo de la imagen si tienes
     },
     {
       title: "Ensalada de Quinoa",
-      description: "Ensalada saludable con quinoa, verduras frescas y aderezo de limón.",
-      steps: JSON.stringify([
-        "Cocinar la quinoa según las instrucciones del paquete.",
-        "Picar el pepino, tomate y cebolla en trozos pequeños.",
-        "Mezclar la quinoa cocida con las verduras.",
-        "Añadir jugo de limón, aceite de oliva y sal al gusto.",
-        "Refrigerar durante 15 minutos antes de servir."
-      ]),
+      description:
+        "Ensalada saludable con quinoa, verduras frescas y aderezo de limón.",
+      steps: [
+        { descripcion: "Cocinar la quinoa según las instrucciones del paquete." },
+        { descripcion: "Picar el pepino, tomate y cebolla en trozos pequeños." },
+        { descripcion: "Mezclar la quinoa cocida con las verduras." },
+        { descripcion: "Añadir jugo de limón, aceite de oliva y sal al gusto." },
+        { descripcion: "Refrigerar durante 15 minutos antes de servir." }
+      ],
       category: "flexi",
-      ingredients: JSON.stringify([
+      ingredients: [
         { nombre: "Quinoa", cantidad: { imperial: "1 cup", metric: "200g" } },
-        { nombre: "Pepino", cantidad: { imperial: "1 unit", metric: "1 unidad" } },
-        { nombre: "Tomate", cantidad: { imperial: "2 units", metric: "2 unidades" } },
-        { nombre: "Cebolla", cantidad: { imperial: "1/2 unit", metric: "1/2 unidad" } },
-        { nombre: "Limón", cantidad: { imperial: "1 unit", metric: "1 unidad" } },
-        { nombre: "Aceite de oliva", cantidad: { imperial: "2 tbsp", metric: "30ml" } },
-        { nombre: "Sal", cantidad: { imperial: "to taste", metric: "al gusto" } }
-      ]),
+        {
+          nombre: "Pepino",
+          cantidad: { imperial: "1 unit", metric: "1 unidad" },
+        },
+        {
+          nombre: "Tomate",
+          cantidad: { imperial: "2 units", metric: "2 unidades" },
+        },
+        {
+          nombre: "Cebolla",
+          cantidad: { imperial: "1/2 unit", metric: "1/2 unidad" },
+        },
+        {
+          nombre: "Limón",
+          cantidad: { imperial: "1 unit", metric: "1 unidad" },
+        },
+        {
+          nombre: "Aceite de oliva",
+          cantidad: { imperial: "2 tbsp", metric: "30ml" },
+        },
+        {
+          nombre: "Sal",
+          cantidad: { imperial: "to taste", metric: "al gusto" },
+        },
+      ],
       serving_size: 2,
       preparation_time: 50,
       is_premium: 0,
-      image: null // Aquí podrías añadir la URL o el nombre del archivo de la imagen si tienes
+      image: null, // Aquí podrías añadir la URL o el nombre del archivo de la imagen si tienes
     },
   ];
 
@@ -114,6 +149,7 @@ const insertInitialData = async () => {
       recipe_id: 2,
     },
   ];
+  console.log("Insertando comentarios...");
   await Comment.bulkCreate(commentData, { ignoreDuplicates: true });
   console.log("Comentarios insertados correctamente.");
 

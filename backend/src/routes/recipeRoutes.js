@@ -33,11 +33,11 @@ const router = Router();
 router.get('/category-count', getRecipeCategoryCount); // Asegúrate de que esta ruta esté aquí
 
 router.get('/:id', getRecipeById);
-router.post('/', authenticateToken(['user', 'admin']), recipeValidator, addRecipe);
+router.post('/', authenticateToken(['admin']), recipeValidator, addRecipe);
 
 // Aquí añadimos ambas rutas para actualizar recetas: PUT y PATCH
-router.put('/:id', authenticateToken(['user', 'admin']), idValidator, recipeValidator, updateRecipe);
-router.patch('/:id', authenticateToken(['user', 'admin']), idValidator, recipeValidatorPatch, updateRecipe);
+router.put('/:id', authenticateToken(['admin']), idValidator, recipeValidator, updateRecipe);
+router.patch('/:id', authenticateToken(['admin']), idValidator, recipeValidatorPatch, updateRecipe);
 
 router.delete('/:id', authenticateToken(['admin']), idValidator, deleteRecipe);
 

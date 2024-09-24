@@ -98,10 +98,7 @@ export class AddEditRecipeComponent implements OnInit {
   }
 
 
-  // Obtener el array de steps del formulario
-  get steps() {
-    return this.form.get('steps') as FormArray;
-  }
+
 
   /*getRecipeById(id: number) {
     this.loading = true;
@@ -128,10 +125,11 @@ export class AddEditRecipeComponent implements OnInit {
     this.recipeService.getRecipeById(id).subscribe({
       next: (response: { code: number; message: string; data: Recipe }) => {
         const recipeData = response.data;
+        console.log('Datos recibidos de la receta:', recipeData);
 
         // Verificar si ingredients ya es un array, si no, parsearlo
         const ingredientsArray = Array.isArray(recipeData.ingredients) ? recipeData.ingredients : JSON.parse(recipeData.ingredients || '[]');
-        ingredientsArray.forEach((ingredient: { nombre: string, cantidad: { imperial: string, metric: string }}) => {
+        ingredientsArray.forEach((ingredient: { nombre: string, cantidad: { imperial: string, metric: string } }) => {
           this.getIngredients().push(this.fb.group({
             nombre: [ingredient.nombre, Validators.required],
             //cantidad: [ingredient.cantidad, Validators.required]
@@ -140,13 +138,17 @@ export class AddEditRecipeComponent implements OnInit {
           }));
         });
 
-      // Verificar si steps ya es un array
-      const stepsArray = Array.isArray(recipeData.steps) ? recipeData.steps : JSON.parse(recipeData.steps || '[]');
-      stepsArray.forEach((step: { descripcion: string }) => {
-        this.getSteps().push(this.fb.group({
-          descripcion: [step.descripcion, Validators.required]
-        }));
-      });
+        // Verificar si steps ya es un array
+        const stepsArray = Array.isArray(recipeData.steps) ? recipeData.steps : JSON.parse(recipeData.steps || '[]');
+        console.log('Steps array:', stepsArray);
+        stepsArray.forEach((step: { descripcion: string }) => {
+          this.getSteps().push(this.fb.group({
+            descripcion: [step.descripcion, Validators.required]
+
+          }));
+          console.log('Pasos añadidos:', this.getSteps().controls);
+        });
+        console.log('Pasos añadidos2:', this.getSteps().controls);
 
         this.form.patchValue({
           title: recipeData.title,
@@ -165,6 +167,65 @@ export class AddEditRecipeComponent implements OnInit {
       }
     });
   }
+  /*getRecipeById(id: number) {
+    this.loading = true;
+    this.recipeService.getRecipeById(id).subscribe({
+      next: (response: { code: number; message: string; data: Recipe }) => {
+        const recipeData = response.data;
+        console.log('Datos recibidos de la receta:', recipeData);
+  
+        // Asegurarse de que ingredients es un array o convertirlo desde JSON
+        let ingredientsArray = [];
+        try {
+          ingredientsArray = Array.isArray(recipeData.ingredients)
+            ? recipeData.ingredients
+            : JSON.parse(recipeData.ingredients || '[]');
+        } catch (error) {
+          console.error('Error al parsear los ingredientes:', error);
+        }
+  
+        ingredientsArray.forEach((ingredient: { nombre: string, cantidad: { imperial: string, metric: string }}) => {
+          this.getIngredients().push(this.fb.group({
+            nombre: [ingredient.nombre, Validators.required],
+            cantidadImperial: [ingredient.cantidad.imperial, Validators.required],
+            cantidadMetric: [ingredient.cantidad.metric, Validators.required]
+          }));
+        });
+  
+        // Asegurarse de que steps es un array o convertirlo desde JSON
+        let stepsArray = [];
+        try {
+          stepsArray = Array.isArray(recipeData.steps)
+            ? recipeData.steps
+            : JSON.parse(recipeData.steps || '[]');
+        } catch (error) {
+          console.error('Error al parsear los pasos:', error);
+        }
+  
+        stepsArray.forEach((step: { descripcion: string }) => {
+          this.getSteps().push(this.fb.group({
+            descripcion: [step.descripcion, Validators.required]
+          }));
+        });
+  
+        this.form.patchValue({
+          title: recipeData.title,
+          description: recipeData.description,
+          category: recipeData.category,
+          is_premium: recipeData.is_premium,
+          serving_size: recipeData.serving_size,
+          preparation_time: recipeData.preparation_time,
+          image: recipeData.image
+        });
+  
+        this.loading = false;
+      },
+      error: () => {
+        this.notificationService.showError('Error al cargar la receta.');
+        this.loading = false;
+      }
+    });
+  }*/
 
   saveRecipe() {
     if (this.form.invalid) {
@@ -175,13 +236,13 @@ export class AddEditRecipeComponent implements OnInit {
     const formValue = this.form.value;
 
     // Convertir el array de ingredientes en JSON
-    formValue.ingredients = formValue.ingredients.map((ingredient: { nombre: string, cantidadImperial: string, cantidadMetric: string  }) => ({
+    formValue.ingredients = formValue.ingredients.map((ingredient: { nombre: string, cantidadImperial: string, cantidadMetric: string }) => ({
       nombre: ingredient.nombre,
-     // cantidad: ingredient.cantidad
-     cantidad: {
-      imperial: ingredient.cantidadImperial,  // Usar cantidadImperial para coincidir con el HTML
-      metric: ingredient.cantidadMetric       // Usar cantidadMetric para coincidir con el HTML
-    }
+      // cantidad: ingredient.cantidad
+      cantidad: {
+        imperial: ingredient.cantidadImperial,  // Usar cantidadImperial para coincidir con el HTML
+        metric: ingredient.cantidadMetric       // Usar cantidadMetric para coincidir con el HTML
+      }
     }));
     // Convertir el array de steps en JSON
     formValue.steps = formValue.steps.map((step: { descripcion: string }) => ({
@@ -189,6 +250,9 @@ export class AddEditRecipeComponent implements OnInit {
     }));
 
     const recipe = { id: this.id, ...this.form.value };
+
+    console.log('Datos a guardar:', recipe);
+
     this.loading = true;
 
     if (this.id !== 0) {
@@ -217,6 +281,60 @@ export class AddEditRecipeComponent implements OnInit {
       });
     }
   }
+  /*saveRecipe() {
+    if (this.form.invalid) {
+      this.notificationService.showError('Por favor, complete todos los campos.');
+      return;
+    }
+
+    const formValue = this.form.value;
+
+    // Convertir el array de ingredientes a JSON
+    formValue.ingredients = formValue.ingredients.map(
+      (ingredient: { nombre: string, cantidadImperial: string, cantidadMetric: string }) => ({
+        nombre: ingredient.nombre,
+        cantidad: {
+          imperial: ingredient.cantidadImperial,
+          metric: ingredient.cantidadMetric
+        }
+      })
+    );
+
+    // Convertir el array de steps a JSON
+    formValue.steps = formValue.steps.map((step: { descripcion: string }) => ({
+      descripcion: step.descripcion
+    }));
+
+    const recipe = { id: this.id, ...formValue };
+    this.loading = true;
+
+    if (this.id !== 0) {
+      this.recipeService.updateRecipe(this.id, recipe).subscribe({
+        next: () => {
+          this.notificationService.showSuccess('Receta actualizada con éxito.');
+          this.loading = false;
+          this.router.navigate(['/recipes']);
+        },
+        error: () => {
+          this.notificationService.showError('Error al actualizar la receta.');
+          this.loading = false;
+        }
+      });
+    } else {
+      this.recipeService.addRecipe(recipe).subscribe({
+        next: () => {
+          this.notificationService.showSuccess('Receta registrada con éxito.');
+          this.loading = false;
+          this.router.navigate(['/recipes']);
+        },
+        error: () => {
+          this.notificationService.showError('Error al registrar la receta.');
+          this.loading = false;
+        }
+      });
+    }
+  }*/
+
   cancel() {
     this.router.navigate(['/recipes']);
   }
