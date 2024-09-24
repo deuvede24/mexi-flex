@@ -11,6 +11,7 @@ import { RegisterComponent } from './components/register/register.component';
 import { AuthGuard } from './guards/auth.guard';
 import { ListLocationsComponent } from './components/list-locations/list-locations.component'; 
 import { EditLocationComponent } from './components/edit-location/edit-location.component';
+import { ListRecipesUserComponent } from './components/list-recipes-user/list-recipes-user.component';
 
 export const routes: Routes = [
   { path: '', component: HomeComponent },
@@ -32,6 +33,10 @@ export const routes: Routes = [
   { path: 'recipes/add', component: AddEditRecipeComponent, canActivate: [AuthGuard] },
   { path: 'recipes/edit/:id', component: AddEditRecipeComponent, canActivate: [AuthGuard] },
   { path: 'recipes/view/:id', component: ViewRecipeComponent, canActivate: [AuthGuard] },
+
+  { path: 'recipes-user', component: ListRecipesUserComponent },
+
+  
 
   { path: '**', redirectTo: '', pathMatch: 'full' },
 ];

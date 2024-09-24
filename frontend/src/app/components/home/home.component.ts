@@ -50,6 +50,10 @@ export class HomeComponent implements OnInit {
     this.router.navigate(['/recipes']);
   }
 
+  goToUserRecipes(): void {
+    this.router.navigate(['/recipes-user']); // Nueva ruta para users y guests
+  }
+
   goToAccount(): void {
     this.router.navigate(['/account']); // Asumiendo que tienes una ruta '/account'
   }
