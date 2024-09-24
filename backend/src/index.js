@@ -8,8 +8,6 @@ import recipeRoutes from "./routes/recipeRoutes.js"; // Importar correctamente
 import testRoutes from "./routes/testRoutes.js"; // Si esto es necesario
 import commentRoutes from "./routes/commentRoutes.js";
 import favoriteRoutes from "./routes/favoriteRoutes.js";
-import ingredientRoutes from "./routes/ingredientRoutes.js";
-import recipeIngredientRoutes from "./routes/recipeIngredientRoutes.js";
 //import mapLocationRoutes from './routes/mapRoutes.js'
 import mapRoutes from './routes/mapRoutes.js';
 import eventRoutes from './routes/eventRoutes.js';
@@ -45,8 +43,6 @@ app.use('/recipes', recipeRoutes); // Asegúrate de que esta línea esté correc
 app.use("/test", testRoutes); // Si esto es necesario
 app.use("/comments", commentRoutes);
 app.use("/favorites", favoriteRoutes);
-app.use("/ingredients", ingredientRoutes);
-app.use("/recipe-ingredients", recipeIngredientRoutes);
 //app.use('/locations', mapLocationRoutes);
 app.use('/map', mapRoutes);
 app.use('/events', eventRoutes);  // Añadir las rutas de eventos

@@ -135,8 +135,8 @@ export class AddEditRecipeComponent implements OnInit {
           this.getIngredients().push(this.fb.group({
             nombre: [ingredient.nombre, Validators.required],
             //cantidad: [ingredient.cantidad, Validators.required]
-            cantidad_imperial: [ingredient.cantidad.imperial, Validators.required],
-            cantidad_metric: [ingredient.cantidad.metric, Validators.required]
+            cantidadImperial: [ingredient.cantidad.imperial, Validators.required],
+            cantidadMetric: [ingredient.cantidad.metric, Validators.required]
           }));
         });
 

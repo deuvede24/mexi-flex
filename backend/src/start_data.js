@@ -28,6 +28,21 @@ const insertInitialData = async () => {
       roles: "user",
       avatar: null, // URL de avatar opcional
     },
+    {
+      email: "carolina@gmail.com",
+      password: '111111',
+      username: "user",
+      roles: "user",
+      avatar: null, // URL de avatar opcional
+    },
+    {
+      email: "dogbark@gmail.com",
+      password: '111111',
+      username: "user",
+      roles: "user",
+      avatar: null, // URL de avatar opcional
+    },
+    
   ];
 
   await User.bulkCreate(userData, { ignoreDuplicates: true });
@@ -45,14 +60,14 @@ const insertInitialData = async () => {
       ]),
       category: "flexi",
       ingredients: JSON.stringify([
-        { nombre: "Tofu", cantidad: "200g" },
-        { nombre: "Salsa de soja", cantidad: "2 cucharadas" },
-        { nombre: "Ajo", cantidad: "2 dientes" },
-        { nombre: "Limón", cantidad: "1 unidad" },
-        { nombre: "Verduras frescas", cantidad: "al gusto" },
-        { nombre: "Tortillas", cantidad: "4 unidades" }
+        { nombre: "Tofu", cantidad: { imperial: "8 oz", metric: "200g" } },
+        { nombre: "Salsa de soja", cantidad: { imperial: "2 tbsp", metric: "30ml" } },
+        { nombre: "Ajo", cantidad: { imperial: "2 cloves", metric: "2 dientes" } },
+        { nombre: "Limón", cantidad: { imperial: "1 unit", metric: "1 unidad" } },
+        { nombre: "Verduras frescas", cantidad: { imperial: "to taste", metric: "al gusto" } },
+        { nombre: "Tortillas", cantidad: { imperial: "4 units", metric: "4 unidades" } }
       ]),
-      serving_size: 2,
+      serving_size: 1,
       preparation_time: 20,
       is_premium: 0,
       image: null // Aquí podrías añadir la URL o el nombre del archivo de la imagen si tienes
@@ -69,13 +84,13 @@ const insertInitialData = async () => {
       ]),
       category: "flexi",
       ingredients: JSON.stringify([
-        { nombre: "Quinoa", cantidad: "200g" },
-        { nombre: "Pepino", cantidad: "1 unidad" },
-        { nombre: "Tomate", cantidad: "2 unidades" },
-        { nombre: "Cebolla", cantidad: "1/2 unidad" },
-        { nombre: "Limón", cantidad: "1 unidad" },
-        { nombre: "Aceite de oliva", cantidad: "2 cucharadas" },
-        { nombre: "Sal", cantidad: "al gusto" }
+        { nombre: "Quinoa", cantidad: { imperial: "1 cup", metric: "200g" } },
+        { nombre: "Pepino", cantidad: { imperial: "1 unit", metric: "1 unidad" } },
+        { nombre: "Tomate", cantidad: { imperial: "2 units", metric: "2 unidades" } },
+        { nombre: "Cebolla", cantidad: { imperial: "1/2 unit", metric: "1/2 unidad" } },
+        { nombre: "Limón", cantidad: { imperial: "1 unit", metric: "1 unidad" } },
+        { nombre: "Aceite de oliva", cantidad: { imperial: "2 tbsp", metric: "30ml" } },
+        { nombre: "Sal", cantidad: { imperial: "to taste", metric: "al gusto" } }
       ]),
       serving_size: 2,
       preparation_time: 50,
