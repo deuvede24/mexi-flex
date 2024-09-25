@@ -116,84 +116,88 @@ const insertInitialData = async () => {
       console.log("ID de receta:", recipe.id_recipe);
     });
 
+    // Ordenar las recetas para evitar asignación incorrecta
+    const tacosTofuRecipe = insertedRecipes.find(recipe => recipe.title === "Tacos de Tofu");
+    const quinoaSaladRecipe = insertedRecipes.find(recipe => recipe.title === "Ensalada de Quinoa");
+
     // Insertar ingredientes asociados a las recetas
     const ingredientsData = [
       // Ingredientes para "Tacos de Tofu"
       {
-        recipe_id: insertedRecipes[0].id_recipe,
+        recipe_id: tacosTofuRecipe.id_recipe,
         ingredient_name: "Tofu",
         imperial_quantity: "8 oz",
         metric_quantity: "200g",
       },
       {
-        recipe_id: insertedRecipes[0].id_recipe,
+        recipe_id: tacosTofuRecipe.id_recipe,
         ingredient_name: "Salsa de soja",
         imperial_quantity: "2 tbsp",
         metric_quantity: "30ml",
       },
       {
-        recipe_id: insertedRecipes[0].id_recipe,
+        recipe_id: tacosTofuRecipe.id_recipe,
         ingredient_name: "Ajo",
         imperial_quantity: "2 cloves",
         metric_quantity: "2 dientes",
       },
       {
-        recipe_id: insertedRecipes[0].id_recipe,
+        recipe_id: tacosTofuRecipe.id_recipe,
         ingredient_name: "Limón",
         imperial_quantity: "1 unit",
         metric_quantity: "1 unidad",
       },
       {
-        recipe_id: insertedRecipes[0].id_recipe,
+        recipe_id: tacosTofuRecipe.id_recipe,
         ingredient_name: "Verduras frescas",
         imperial_quantity: "to taste",
         metric_quantity: "al gusto",
       },
       {
-        recipe_id: insertedRecipes[0].id_recipe,
+        recipe_id: tacosTofuRecipe.id_recipe,
         ingredient_name: "Tortillas",
         imperial_quantity: "4 units",
         metric_quantity: "4 unidades",
       },
       // Ingredientes para "Ensalada de Quinoa"
       {
-        recipe_id: insertedRecipes[1].id_recipe,
+        recipe_id: quinoaSaladRecipe.id_recipe,
         ingredient_name: "Quinoa",
         imperial_quantity: "1 cup",
         metric_quantity: "200g",
       },
       {
-        recipe_id: insertedRecipes[1].id_recipe,
+        recipe_id: quinoaSaladRecipe.id_recipe,
         ingredient_name: "Pepino",
         imperial_quantity: "1 unit",
         metric_quantity: "1 unidad",
       },
       {
-        recipe_id: insertedRecipes[1].id_recipe,
+        recipe_id: quinoaSaladRecipe.id_recipe,
         ingredient_name: "Tomate",
         imperial_quantity: "2 units",
         metric_quantity: "2 unidades",
       },
       {
-        recipe_id: insertedRecipes[1].id_recipe,
+        recipe_id: quinoaSaladRecipe.id_recipe,
         ingredient_name: "Cebolla",
         imperial_quantity: "1/2 unit",
         metric_quantity: "1/2 unidad",
       },
       {
-        recipe_id: insertedRecipes[1].id_recipe,
+        recipe_id: quinoaSaladRecipe.id_recipe,
         ingredient_name: "Limón",
         imperial_quantity: "1 unit",
         metric_quantity: "1 unidad",
       },
       {
-        recipe_id: insertedRecipes[1].id_recipe,
+        recipe_id: quinoaSaladRecipe.id_recipe,
         ingredient_name: "Aceite de oliva",
         imperial_quantity: "2 tbsp",
         metric_quantity: "30ml",
       },
       {
-        recipe_id: insertedRecipes[1].id_recipe,
+        recipe_id: quinoaSaladRecipe.id_recipe,
         ingredient_name: "Sal",
         imperial_quantity: "to taste",
         metric_quantity: "al gusto",
@@ -287,3 +291,4 @@ const insertInitialData = async () => {
 };
 
 export default insertInitialData;
+
