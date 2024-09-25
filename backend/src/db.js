@@ -20,6 +20,7 @@ const syncroModel = async () => {
 
     console.log(sequelize.models);
     console.log("Modelos registrados:", Object.keys(sequelize.models));
+    
     await sequelize.sync({ alter: true }).then(() => {
       console.log("Modelos sincronizado con la base de datos");
     });

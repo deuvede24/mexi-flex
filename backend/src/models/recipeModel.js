@@ -5,9 +5,10 @@ import User from './userModel.js';
 
 const Recipe = sequelize.define('Recipe', {
   id_recipe: {
-    type: DataTypes.INTEGER(8).UNSIGNED,
+    type: DataTypes.INTEGER(8),
     primaryKey: true,
     autoIncrement: true,
+    allowNull: false,
   },
  /* user_id: {
     type: DataTypes.INTEGER(8).UNSIGNED
@@ -33,10 +34,6 @@ const Recipe = sequelize.define('Recipe', {
     allowNull: false,
     defaultValue: 0
   },
-  ingredients: {
-    type: DataTypes.JSON,
-    allowNull: false,
-  },
   image: {
     type: DataTypes.STRING(255),
     allowNull: true,  // Por si acaso no todas las recetas tienen imagen
@@ -54,6 +51,7 @@ const Recipe = sequelize.define('Recipe', {
   
 }, {
   
+  tableName: 'recipes', // Añadimos el nombre explícito de la tabla
   indexes: [{ unique: true, fields: ['title'] }],
   timestamps: true,
   updatedAt: 'updated_at',

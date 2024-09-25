@@ -35,6 +35,8 @@ export const routes: Routes = [
   { path: 'recipes/view/:id', component: ViewRecipeComponent, canActivate: [AuthGuard] },
 
   { path: 'recipes-user', component: ListRecipesUserComponent },
+  { path: 'recipes/view/:id', component: ViewRecipeComponent, canActivate: [AuthGuard] },
+
 
   
 

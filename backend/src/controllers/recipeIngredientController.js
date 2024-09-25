@@ -1,92 +1,76 @@
 import RecipeIngredient from '../models/recipeIngredientModel.js';
 import { validationResult } from 'express-validator';
 
-export const getRecipeIngredients = async (req, res) => {
+// Obtener todos los ingredientes de una receta específica
+export const getIngredientsByRecipe = async (req, res) => {
   try {
-    const recipeIngredients = await RecipeIngredient.findAll();
-    res.status(200).json({ recipeIngredients });
-  } catch (error) {
-    res.status(500).json({ error: error.message });
-  }
-};
-
-export const getRecipeIngredientById = async (req, res) => {
-  try {
-    const { recipe_id, ingredient_id } = req.params;
-    const recipeIngredient = await RecipeIngredient.findOne({
-      where: {
-        recipe_id,
-        ingredient_id,
-      },
+    const ingredients = await RecipeIngredient.findAll({
+      where: { recipe_id: req.params.recipeId }
     });
-    if (recipeIngredient) {
-      res.status(200).json({ recipeIngredient });
-    } else {
-      res.status(404).json({ error: 'Recipe Ingredient not found' });
-    }
+    res.json(ingredients);
   } catch (error) {
-    res.status(500).json({ error: error.message });
+    res.status(500).json({ error: 'Error al obtener los ingredientes' });
   }
 };
+// Añadir un ingrediente a una receta
+export const addIngredientToRecipe = async (req, res) => {
+  const { ingredient_name, imperial_quantity, metric_quantity } = req.body;
+  const userRole = req.user.role; // Verificar el rol
 
-export const addRecipeIngredient = async (req, res) => {
-  const errors = validationResult(req);
-  if (!errors.isEmpty()) {
-    return res.status(400).json({ errors: errors.array() });
+  // Si es guest, no permitimos añadir ingredientes
+  if (userRole === 'guest') {
+    return res.status(403).json({ error: 'Los invitados no pueden añadir ingredientes' });
   }
 
   try {
-    const { recipe_id, ingredient_id, quantity } = req.body;
-    const newRecipeIngredient = await RecipeIngredient.create({ recipe_id, ingredient_id, quantity });
-    res.status(201).json({ newRecipeIngredient });
-  } catch (error) {
-    res.status(500).json({ error: error.message });
-  }
-};
-
-export const updateRecipeIngredient = async (req, res) => {
-  const errors = validationResult(req);
-  if (!errors.isEmpty()) {
-    return res.status(400).json({ errors: errors.array() });
-  }
-
-  try {
-    const { recipe_id, ingredient_id } = req.params;
-    const { quantity } = req.body;
-    const recipeIngredient = await RecipeIngredient.findOne({
-      where: {
-        recipe_id,
-        ingredient_id,
-      },
+    const newIngredient = await RecipeIngredient.create({
+      recipe_id: req.params.recipeId,
+      ingredient_name,
+      imperial_quantity,
+      metric_quantity
     });
-    if (recipeIngredient) {
-      recipeIngredient.quantity = quantity;
-      await recipeIngredient.save();
-      res.status(200).json({ recipeIngredient });
-    } else {
-      res.status(404).json({ error: 'Recipe Ingredient not found' });
-    }
+    res.json(newIngredient);
   } catch (error) {
-    res.status(500).json({ error: error.message });
+    res.status(500).json({ error: 'Error al añadir el ingrediente' });
   }
 };
 
-export const deleteRecipeIngredient = async (req, res) => {
+// Actualizar un ingrediente de una receta
+export const updateIngredient = async (req, res) => {
+  const { ingredient_name, imperial_quantity, metric_quantity } = req.body;
+  const userRole = req.user.role; // Verificar el rol
+
+  // Si es guest, no permitimos actualizar ingredientes
+  if (userRole === 'guest') {
+    return res.status(403).json({ error: 'Los invitados no pueden actualizar ingredientes' });
+  }
+
   try {
-    const { recipe_id, ingredient_id } = req.params;
-    const deleted = await RecipeIngredient.destroy({
-      where: {
-        recipe_id,
-        ingredient_id,
-      },
-    });
-    if (deleted) {
-      res.status(204).send();
-    } else {
-      res.status(404).json({ error: 'Recipe Ingredient not found' });
-    }
+    const updatedIngredient = await RecipeIngredient.update(
+      { ingredient_name, imperial_quantity, metric_quantity },
+      { where: { id_recipe_ingredients: req.params.ingredientId } }
+    );
+    res.json(updatedIngredient);
   } catch (error) {
-    res.status(500).json({ error: error.message });
+    res.status(500).json({ error: 'Error al actualizar el ingrediente' });
   }
 };
 
+// Eliminar un ingrediente de una receta
+export const deleteIngredient = async (req, res) => {
+  const userRole = req.user.role; // Verificar el rol
+
+  // Si es guest, no permitimos eliminar ingredientes
+  if (userRole === 'guest') {
+    return res.status(403).json({ error: 'Los invitados no pueden eliminar ingredientes' });
+  }
+
+  try {
+    await RecipeIngredient.destroy({
+      where: { id_recipe_ingredients: req.params.ingredientId }
+    });
+    res.json({ message: 'Ingrediente eliminado con éxito' });
+  } catch (error) {
+    res.status(500).json({ error: 'Error al eliminar el ingrediente' });
+  }
+};

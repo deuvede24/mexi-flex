@@ -13,6 +13,8 @@ import mapRoutes from './routes/mapRoutes.js';
 import eventRoutes from './routes/eventRoutes.js';
 import chartRoutes from './routes/chartRoutes.js';
 
+import recipeIngredientRoutes from './routes/recipeIngredientRoutes.js';
+
 
 import { testConnection } from "./db.js";
 import insertInitialData from "./start_data.js";
@@ -48,7 +50,7 @@ app.use('/map', mapRoutes);
 app.use('/events', eventRoutes);  // Añadir las rutas de eventos
 app.use('/api/charts', chartRoutes); 
 
-
+app.use('/recipe-ingredients', recipeIngredientRoutes);
 
 // Iniciar el servidor
 const PORT = 3000;
