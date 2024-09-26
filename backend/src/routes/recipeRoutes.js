@@ -21,30 +21,40 @@ router.get('/', getRecipes);
 export default router;*/
 
 //NEW
-
+// src/routes/recipeRoutes.js
 import { Router } from 'express';
-import { getRecipes, getRecipeById, addRecipe, updateRecipe, deleteRecipe, getRecipeCategoryCount } from '../controllers/recipeController.js'; // Asegúrate de importar getRecipeCategoryCount
+import {
+  getRecipes,
+  getRecipeById,
+  addRecipe,
+  updateRecipe,
+  deleteRecipe,
+  getRecipeCategoryCount
+} from '../controllers/recipeController.js';
 import { authenticateToken } from '../middlewares/authenticateToken.js';
-import { recipeValidator, recipeValidatorPatch } from '../validations/recipeValidation.js';
+import { recipeValidator } from '../validations/recipeValidation.js';
 import { idValidator } from '../validations/genericValidation.js';
 
 const router = Router();
 
-router.get('/category-count', getRecipeCategoryCount); // Asegúrate de que esta ruta esté aquí
+router.get('/category-count', getRecipeCategoryCount);
 
+// Obtener receta por ID con versiones e ingredientes
 router.get('/:id', getRecipeById);
+
+// Crear receta con versiones e ingredientes (solo admin)
 router.post('/', authenticateToken(['admin']), recipeValidator, addRecipe);
 
-// Aquí añadimos ambas rutas para actualizar recetas: PUT y PATCH
+// Actualizar receta (solo admin)
 router.put('/:id', authenticateToken(['admin']), idValidator, recipeValidator, updateRecipe);
-router.patch('/:id', authenticateToken(['admin']), idValidator, recipeValidatorPatch, updateRecipe);
 
+// Eliminar receta (solo admin)
 router.delete('/:id', authenticateToken(['admin']), idValidator, deleteRecipe);
 
-// Ruta accesible para todos para obtener las recetas
+// Obtener todas las recetas (controla los invitados)
 router.get('/', getRecipes);
 
-
 export default router;
+
 
 

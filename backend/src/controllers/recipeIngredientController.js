@@ -1,30 +1,31 @@
+// src/controllers/recipeIngredientController.js
 import RecipeIngredient from '../models/recipeIngredientModel.js';
 import { validationResult } from 'express-validator';
 
-// Obtener todos los ingredientes de una receta específica
-export const getIngredientsByRecipe = async (req, res) => {
+// Obtener todos los ingredientes de una versión específica de receta
+export const getIngredientsByVersion = async (req, res) => {
   try {
     const ingredients = await RecipeIngredient.findAll({
-      where: { recipe_id: req.params.recipeId }
+      where: { version_id: req.params.versionId }
     });
     res.json(ingredients);
   } catch (error) {
     res.status(500).json({ error: 'Error al obtener los ingredientes' });
   }
 };
-// Añadir un ingrediente a una receta
-export const addIngredientToRecipe = async (req, res) => {
-  const { ingredient_name, imperial_quantity, metric_quantity } = req.body;
-  const userRole = req.user.role; // Verificar el rol
 
-  // Si es guest, no permitimos añadir ingredientes
+// Añadir un ingrediente a una versión de receta
+export const addIngredientToVersion = async (req, res) => {
+  const { ingredient_name, imperial_quantity, metric_quantity } = req.body;
+  const userRole = req.user.roles; // Verificar el rol
+
   if (userRole === 'guest') {
     return res.status(403).json({ error: 'Los invitados no pueden añadir ingredientes' });
   }
 
   try {
     const newIngredient = await RecipeIngredient.create({
-      recipe_id: req.params.recipeId,
+      version_id: req.params.versionId,
       ingredient_name,
       imperial_quantity,
       metric_quantity
@@ -35,12 +36,11 @@ export const addIngredientToRecipe = async (req, res) => {
   }
 };
 
-// Actualizar un ingrediente de una receta
+// Actualizar un ingrediente de una versión de receta
 export const updateIngredient = async (req, res) => {
   const { ingredient_name, imperial_quantity, metric_quantity } = req.body;
-  const userRole = req.user.role; // Verificar el rol
+  const userRole = req.user.roles;
 
-  // Si es guest, no permitimos actualizar ingredientes
   if (userRole === 'guest') {
     return res.status(403).json({ error: 'Los invitados no pueden actualizar ingredientes' });
   }
@@ -56,11 +56,10 @@ export const updateIngredient = async (req, res) => {
   }
 };
 
-// Eliminar un ingrediente de una receta
+// Eliminar un ingrediente de una versión de receta
 export const deleteIngredient = async (req, res) => {
-  const userRole = req.user.role; // Verificar el rol
+  const userRole = req.user.roles;
 
-  // Si es guest, no permitimos eliminar ingredientes
   if (userRole === 'guest') {
     return res.status(403).json({ error: 'Los invitados no pueden eliminar ingredientes' });
   }

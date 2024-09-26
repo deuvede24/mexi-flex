@@ -1,6 +1,7 @@
 import bcrypt from "bcrypt";
 import User from "./models/userModel.js";
 import Recipe from "./models/recipeModel.js";
+import RecipeVersion from './models/recipeVersionModel.js';
 import MapLocation from "./models/mapModel.js";
 import Event from "./models/eventModel.js";
 import RecipeIngredient from "./models/recipeIngredientModel.js"; // Importar el modelo de ingredientes
@@ -50,37 +51,15 @@ const insertInitialData = async () => {
     // Insertar recetas
     const recipeData = [
       {
-        title: "Tacos de Tofu",
+        title: "Tacos de Picadillo",
         description:
-          "Deliciosos tacos veganos hechos con tofu marinado y verduras frescas.",
-        steps: [
-          { descripcion: "Marinar el tofu con salsa de soja, ajo y limón." },
-          { descripcion: "Freír el tofu y mezclar con las verduras frescas." },
-          { descripcion: "Servir con tortillas calientes." },
-        ],
-        category: "flexi",
-        serving_size: 1,
-        preparation_time: 20,
+          "Tacos tradicionales con carne molida de ternera o versión flexi con Heura.",
+        category: "traditional",
+        serving_size: 4,
+        preparation_time: 45,
         is_premium: 0,
-        image: null,
-      },
-      {
-        title: "Ensalada de Quinoa",
-        description:
-          "Ensalada saludable con quinoa, verduras frescas y aderezo de limón.",
-        steps: [
-          { descripcion: "Cocinar la quinoa según las instrucciones del paquete." },
-          { descripcion: "Picar el pepino, tomate y cebolla en trozos pequeños." },
-          { descripcion: "Mezclar la quinoa cocida con las verduras." },
-          { descripcion: "Añadir jugo de limón, aceite de oliva y sal al gusto." },
-          { descripcion: "Refrigerar durante 15 minutos antes de servir." },
-        ],
-        category: "flexi",
-        serving_size: 2,
-        preparation_time: 50,
-        is_premium: 0,
-        image: null,
-      },
+        image: "tacos_picadillo.jpg",
+      }
     ];
 
     // Insertar las recetas
@@ -89,7 +68,6 @@ const insertInitialData = async () => {
       updateOnDuplicate: [
         "title",
         "description",
-        "steps",
         "category",
         "is_premium",
         "serving_size",
@@ -106,112 +84,129 @@ const insertInitialData = async () => {
       attributes: ["id_recipe", "title"],
     });
 
-    console.log("Recetas insertadas:", insertedRecipes);
+    const tacosPicadilloRecipe = insertedRecipes.find(recipe => recipe.title === "Tacos de Picadillo");
 
-    // Verificar si los IDs están presentes y si no, lanzar un error
-    insertedRecipes.forEach((recipe) => {
-      if (!recipe.id_recipe) {
-        throw new Error(`ID de receta es null para la receta: ${recipe.title}`);
+    if (!tacosPicadilloRecipe) {
+      throw new Error("La receta 'Tacos de Picadillo' no fue encontrada.");
+    }
+
+    // Insertar versiones de la receta
+    const versionData = [
+      {
+        recipe_id: tacosPicadilloRecipe.id_recipe,
+        version_name: "tradicional",
+        steps: [
+          { descripcion: "Dorar la carne molida de ternera con cebolla y ajo." },
+          { descripcion: "Agregar tomate, cilantro y cocinar a fuego lento." },
+          { descripcion: "Servir en tortillas de maíz calientes." }
+        ]
+      },
+      {
+        recipe_id: tacosPicadilloRecipe.id_recipe,
+        version_name: "flexi",
+        steps: [
+          { descripcion: "Dorar la carne de Heura con cebolla y ajo." },
+          { descripcion: "Agregar tomate, cilantro y cocinar a fuego lento." },
+          { descripcion: "Servir en tortillas de maíz calientes." }
+        ]
       }
-      console.log("ID de receta:", recipe.id_recipe);
-    });
-
-    // Ordenar las recetas para evitar asignación incorrecta
-    const tacosTofuRecipe = insertedRecipes.find(recipe => recipe.title === "Tacos de Tofu");
-    const quinoaSaladRecipe = insertedRecipes.find(recipe => recipe.title === "Ensalada de Quinoa");
-
-    // Insertar ingredientes asociados a las recetas
-    const ingredientsData = [
-      // Ingredientes para "Tacos de Tofu"
-      {
-        recipe_id: tacosTofuRecipe.id_recipe,
-        ingredient_name: "Tofu",
-        imperial_quantity: "8 oz",
-        metric_quantity: "200g",
-      },
-      {
-        recipe_id: tacosTofuRecipe.id_recipe,
-        ingredient_name: "Salsa de soja",
-        imperial_quantity: "2 tbsp",
-        metric_quantity: "30ml",
-      },
-      {
-        recipe_id: tacosTofuRecipe.id_recipe,
-        ingredient_name: "Ajo",
-        imperial_quantity: "2 cloves",
-        metric_quantity: "2 dientes",
-      },
-      {
-        recipe_id: tacosTofuRecipe.id_recipe,
-        ingredient_name: "Limón",
-        imperial_quantity: "1 unit",
-        metric_quantity: "1 unidad",
-      },
-      {
-        recipe_id: tacosTofuRecipe.id_recipe,
-        ingredient_name: "Verduras frescas",
-        imperial_quantity: "to taste",
-        metric_quantity: "al gusto",
-      },
-      {
-        recipe_id: tacosTofuRecipe.id_recipe,
-        ingredient_name: "Tortillas",
-        imperial_quantity: "4 units",
-        metric_quantity: "4 unidades",
-      },
-      // Ingredientes para "Ensalada de Quinoa"
-      {
-        recipe_id: quinoaSaladRecipe.id_recipe,
-        ingredient_name: "Quinoa",
-        imperial_quantity: "1 cup",
-        metric_quantity: "200g",
-      },
-      {
-        recipe_id: quinoaSaladRecipe.id_recipe,
-        ingredient_name: "Pepino",
-        imperial_quantity: "1 unit",
-        metric_quantity: "1 unidad",
-      },
-      {
-        recipe_id: quinoaSaladRecipe.id_recipe,
-        ingredient_name: "Tomate",
-        imperial_quantity: "2 units",
-        metric_quantity: "2 unidades",
-      },
-      {
-        recipe_id: quinoaSaladRecipe.id_recipe,
-        ingredient_name: "Cebolla",
-        imperial_quantity: "1/2 unit",
-        metric_quantity: "1/2 unidad",
-      },
-      {
-        recipe_id: quinoaSaladRecipe.id_recipe,
-        ingredient_name: "Limón",
-        imperial_quantity: "1 unit",
-        metric_quantity: "1 unidad",
-      },
-      {
-        recipe_id: quinoaSaladRecipe.id_recipe,
-        ingredient_name: "Aceite de oliva",
-        imperial_quantity: "2 tbsp",
-        metric_quantity: "30ml",
-      },
-      {
-        recipe_id: quinoaSaladRecipe.id_recipe,
-        ingredient_name: "Sal",
-        imperial_quantity: "to taste",
-        metric_quantity: "al gusto",
-      },
     ];
 
-    try {
-      await RecipeIngredient.bulkCreate(ingredientsData, {
-        ignoreDuplicates: true,
-      });
-      console.log("Ingredientes insertados correctamente.");
-    } catch (error) {
-      console.error("Error al insertar ingredientes:", error);
-    }
+    await RecipeVersion.bulkCreate(versionData, { ignoreDuplicates: true });
+
+    // Obtener IDs de las versiones recién insertadas
+    const insertedVersions = await RecipeVersion.findAll({
+      where: {
+        recipe_id: tacosPicadilloRecipe.id_recipe,
+      },
+      attributes: ["id_version", "version_name"],
+    });
+
+    const traditionalVersion = insertedVersions.find(version => version.version_name === "tradicional");
+    const flexiVersion = insertedVersions.find(version => version.version_name === "flexi");
+
+    // Insertar ingredientes asociados a las versiones
+    const ingredientsData = [
+      // Ingredientes para la versión tradicional
+      {
+        version_id: traditionalVersion.id_version,
+        ingredient_name: "Carne molida de ternera",
+        imperial_quantity: "1 lb",
+        metric_quantity: "500 g"
+      },
+      {
+        version_id: traditionalVersion.id_version,
+        ingredient_name: "Cebolla",
+        imperial_quantity: "1 unit",
+        metric_quantity: "1 unidad"
+      },
+      {
+        version_id: traditionalVersion.id_version,
+        ingredient_name: "Ajo",
+        imperial_quantity: "2 cloves",
+        metric_quantity: "2 dientes"
+      },
+      {
+        version_id: traditionalVersion.id_version,
+        ingredient_name: "Tortillas de maíz",
+        imperial_quantity: "12 units",
+        metric_quantity: "12 unidades"
+      },
+      {
+        version_id: traditionalVersion.id_version,
+        ingredient_name: "Cilantro",
+        imperial_quantity: "To taste",
+        metric_quantity: "Al gusto"
+      },
+      {
+        version_id: traditionalVersion.id_version,
+        ingredient_name: "Tomate",
+        imperial_quantity: "1 unit",
+        metric_quantity: "1 unidad"
+      },
+
+      // Ingredientes para la versión flexi
+      {
+        version_id: flexiVersion.id_version,
+        ingredient_name: "Carne de Heura",
+        imperial_quantity: "1 lb",
+        metric_quantity: "500 g"
+      },
+      {
+        version_id: flexiVersion.id_version,
+        ingredient_name: "Cebolla",
+        imperial_quantity: "1 unit",
+        metric_quantity: "1 unidad"
+      },
+      {
+        version_id: flexiVersion.id_version,
+        ingredient_name: "Ajo",
+        imperial_quantity: "2 cloves",
+        metric_quantity: "2 dientes"
+      },
+      {
+        version_id: flexiVersion.id_version,
+        ingredient_name: "Tortillas de maíz",
+        imperial_quantity: "12 units",
+        metric_quantity: "12 unidades"
+      },
+      {
+        version_id: flexiVersion.id_version,
+        ingredient_name: "Cilantro",
+        imperial_quantity: "To taste",
+        metric_quantity: "Al gusto"
+      },
+      {
+        version_id: flexiVersion.id_version,
+        ingredient_name: "Tomate",
+        imperial_quantity: "1 unit",
+        metric_quantity: "1 unidad"
+      }
+    ];
+
+    await RecipeIngredient.bulkCreate(ingredientsData, { ignoreDuplicates: true });
+
+    console.log("Recetas, versiones e ingredientes insertados correctamente.");
 
     // Insertar ubicaciones en el mapa
     const mapLocationData = [
@@ -291,4 +286,3 @@ const insertInitialData = async () => {
 };
 
 export default insertInitialData;
-

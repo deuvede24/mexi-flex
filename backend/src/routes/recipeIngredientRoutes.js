@@ -13,43 +13,43 @@ router.patch('/:recipe_id/:ingredient_id', authenticateToken(['user', 'admin']),
 router.delete('/:recipe_id/:ingredient_id', authenticateToken(['admin']), deleteRecipeIngredient);
 
 export default router;*/
-
+// src/routes/recipeIngredientRoutes.js
 import { Router } from "express";
 import {
-  getIngredientsByRecipe,
-  addIngredientToRecipe,
+  getIngredientsByVersion,
+  addIngredientToVersion,
   updateIngredient,
-  deleteIngredient,
+  deleteIngredient
 } from "../controllers/recipeIngredientController.js";
 import { authenticateToken } from "../middlewares/authenticateToken.js";
 import { recipeIngredientValidator } from "../validations/recipeIngredientValidation.js";
 
 const router = Router();
 
-// Obtener todos los ingredientes de una receta específica
+// Obtener todos los ingredientes de una versión específica de receta
 router.get(
-  "/:recipeId",
+  "/versions/:versionId/ingredients",
   authenticateToken(["user", "admin"]),
-  getIngredientsByRecipe
+  getIngredientsByVersion
 );
 
-// Añadir un ingrediente a una receta
+// Añadir un ingrediente a una versión de receta (solo admin)
 router.post(
-  "/:recipeId",
+  "/versions/:versionId/ingredients",
   authenticateToken(["admin"]),
   recipeIngredientValidator,
-  addIngredientToRecipe
+  addIngredientToVersion
 );
 
-// Actualizar un ingrediente de una receta
+// Actualizar un ingrediente (solo admin)
 router.put(
-  "/:ingredientId",
+  "/ingredients/:ingredientId",
   authenticateToken(["admin"]),
   recipeIngredientValidator,
   updateIngredient
 );
 
-// Eliminar un ingrediente de una receta
-router.delete("/:ingredientId", authenticateToken(["admin"]), deleteIngredient);
+// Eliminar un ingrediente (solo admin)
+router.delete("/ingredients/:ingredientId", authenticateToken(["admin"]), deleteIngredient);
 
 export default router;

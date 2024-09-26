@@ -1,19 +1,20 @@
+// src/models/recipeIngredientModel.js
 import { DataTypes } from 'sequelize';
 import { sequelize } from '../db.js';
-import Recipe from './recipeModel.js'; // Asegúrate de que existe y está correcto
+import RecipeVersion from './recipeVersionModel.js'; // Referencia a la versión de receta
 
 const RecipeIngredient = sequelize.define('RecipeIngredient', {
   id_recipe_ingredients: {
-    type: DataTypes.INTEGER(11),
+    type: DataTypes.INTEGER(11).UNSIGNED,  // Usamos UNSIGNED para los IDs de ingredientes
     primaryKey: true,
     autoIncrement: true
   },
-  recipe_id: {
-    type: DataTypes.INTEGER(8).UNSIGNED,
+  version_id: {
+    type: DataTypes.INTEGER(11).UNSIGNED,  // Referencia a la versión de la receta
     allowNull: false,
     references: {
-      model: Recipe,
-      key: 'id_recipe'
+      model: RecipeVersion,
+      key: 'id_version'
     }
   },
   ingredient_name: {
@@ -29,11 +30,12 @@ const RecipeIngredient = sequelize.define('RecipeIngredient', {
     allowNull: false
   }
 }, {
-  tableName: 'recipe_ingredients', // Aseguramos que el nombre de la tabla sea el correcto
-  timestamps: false // No necesitamos timestamps en esta tabla
+  tableName: 'recipe_ingredients',
+  timestamps: false  // No es necesario guardar timestamps para los ingredientes
 });
 
-Recipe.hasMany(RecipeIngredient, { foreignKey: 'recipe_id' });
-RecipeIngredient.belongsTo(Recipe, { foreignKey: 'recipe_id' });
+RecipeVersion.hasMany(RecipeIngredient, { foreignKey: 'version_id' });
+RecipeIngredient.belongsTo(RecipeVersion, { foreignKey: 'version_id' });
 
 export default RecipeIngredient;
+

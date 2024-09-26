@@ -1,4 +1,5 @@
 import Recipe from "../models/recipeModel.js";
+import RecipeVersion from "../models/recipeVersionModel.js"; // Importamos la tabla de versiones
 import RecipeIngredient from '../models/recipeIngredientModel.js';
 import { validationResult } from "express-validator";
 import { Sequelize } from "sequelize";
@@ -32,12 +33,15 @@ export const getRecipes = async (req, res) => {
   }
 };
 
-// Obtener receta por ID
+// Obtener receta por ID con versiones e ingredientes
 export const getRecipeById = async (req, res) => {
   try {
     const { id } = req.params;
     const recipe = await Recipe.findByPk(id, {
-      include: RecipeIngredient // Incluir los ingredientes
+      include: {
+        model: RecipeVersion,  // Incluimos las versiones
+        include: RecipeIngredient // Incluimos los ingredientes en cada versión
+      }
     });
 
     if (!recipe) {
@@ -61,7 +65,7 @@ export const getRecipeById = async (req, res) => {
   }
 };
 
-// Añadir una nueva receta con ingredientes
+// Añadir una nueva receta con versiones e ingredientes
 export const addRecipe = async (req, res) => {
   try {
     const errors = validationResult(req);
@@ -69,39 +73,42 @@ export const addRecipe = async (req, res) => {
       return res.status(400).json({ errors: errors.array() });
     }
 
-    // Desestructuración de los campos del cuerpo de la solicitud
-    const { title, description, steps, category, is_premium, ingredients, serving_size = 1, preparation_time = 0, image } = req.body;
+    const { title, description, versions, is_premium, serving_size = 1, preparation_time = 0, image } = req.body;
 
-    // Verificación de campos obligatorios
-    if (!title || !description || !steps || !category || is_premium === undefined || !ingredients) {
+    if (!title || !description || !versions || is_premium === undefined) {
       return res.status(400).json({
         code: -2,
-        message:
-          "Fields: title, description, steps, category, is_premium, and ingredients must be provided",
+        message: "Missing required fields: title, description, versions, is_premium",
       });
     }
 
-    // Creación de la receta
+    // Creamos la receta
     const newRecipe = await Recipe.create({
       title,
       description,
-      steps,
-      category,
       is_premium,
-      serving_size, // Asignamos el valor, por defecto 1 si no viene
-      preparation_time, // Asignamos el valor, por defecto 0 si no viene
+      serving_size,
+      preparation_time,
       image,
     });
 
-    // Crear los ingredientes asociados
-    if (ingredients && ingredients.length > 0) {
-      const ingredientsToAdd = ingredients.map(ingredient => ({
+    // Crear las versiones y los ingredientes
+    for (const version of versions) {
+      const newVersion = await RecipeVersion.create({
         recipe_id: newRecipe.id_recipe,
-        ingredient_name: ingredient.ingredient_name,
-        imperial_quantity: ingredient.imperial_quantity,
-        metric_quantity: ingredient.metric_quantity
-      }));
-      await RecipeIngredient.bulkCreate(ingredientsToAdd);
+        version_name: version.version_name,
+        steps: version.steps
+      });
+
+      if (version.ingredients && version.ingredients.length > 0) {
+        const ingredientsToAdd = version.ingredients.map(ingredient => ({
+          version_id: newVersion.id_version,
+          ingredient_name: ingredient.ingredient_name,
+          imperial_quantity: ingredient.imperial_quantity,
+          metric_quantity: ingredient.metric_quantity
+        }));
+        await RecipeIngredient.bulkCreate(ingredientsToAdd);
+      }
     }
 
     res.status(200).json({
@@ -118,7 +125,7 @@ export const addRecipe = async (req, res) => {
   }
 };
 
-// Actualizar una receta existente
+// Actualizar una receta existente con versiones e ingredientes
 export const updateRecipe = async (req, res) => {
   try {
     const errors = validationResult(req);
@@ -136,34 +143,41 @@ export const updateRecipe = async (req, res) => {
       });
     }
 
-    const { title, description, steps, category, is_premium, ingredients, serving_size = 1, preparation_time = 0, image } = req.body;
+    const { title, description, versions, is_premium, serving_size = 1, preparation_time = 0, image } = req.body;
 
-    // Actualización de la receta
+    // Actualizamos los datos principales de la receta
     await recipe.update({
       title,
       description,
-      steps,
-      category,
       is_premium,
       serving_size, 
       preparation_time, 
       image
     });
 
-    // Actualizar ingredientes
-    if (ingredients && ingredients.length > 0) {
-      // Eliminar los ingredientes antiguos
-      await RecipeIngredient.destroy({ where: { recipe_id: id } });
+    // Actualizamos las versiones y sus ingredientes
+    if (versions && versions.length > 0) {
+      // Eliminamos las versiones anteriores
+      await RecipeVersion.destroy({ where: { recipe_id: id } });
 
-      // Crear los nuevos ingredientes
-      const ingredientsToAdd = ingredients.map(ingredient => ({
-        recipe_id: id,
-        ingredient_name: ingredient.ingredient_name,
-        imperial_quantity: ingredient.imperial_quantity,
-        metric_quantity: ingredient.metric_quantity
-      }));
+      // Creamos las nuevas versiones con ingredientes
+      for (const version of versions) {
+        const updatedVersion = await RecipeVersion.create({
+          recipe_id: id,
+          version_name: version.version_name,
+          steps: version.steps
+        });
 
-      await RecipeIngredient.bulkCreate(ingredientsToAdd);
+        if (version.ingredients && version.ingredients.length > 0) {
+          const ingredientsToAdd = version.ingredients.map(ingredient => ({
+            version_id: updatedVersion.id_version,
+            ingredient_name: ingredient.ingredient_name,
+            imperial_quantity: ingredient.imperial_quantity,
+            metric_quantity: ingredient.metric_quantity
+          }));
+          await RecipeIngredient.bulkCreate(ingredientsToAdd);
+        }
+      }
     }
 
     res.status(200).json({
@@ -180,10 +194,15 @@ export const updateRecipe = async (req, res) => {
   }
 };
 
-// Eliminar una receta
+// Eliminar una receta junto con sus versiones e ingredientes
 export const deleteRecipe = async (req, res) => {
   try {
     const { id } = req.params;
+
+    // Eliminamos las versiones de la receta y sus ingredientes
+    await RecipeVersion.destroy({ where: { recipe_id: id } });
+
+    // Luego eliminamos la receta
     const deletedRecipe = await Recipe.destroy({ where: { id_recipe: id } });
 
     if (!deletedRecipe) {
@@ -230,3 +249,4 @@ export const getRecipeCategoryCount = async (req, res) => {
     });
   }
 };
+
