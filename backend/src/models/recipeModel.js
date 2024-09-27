@@ -7,7 +7,7 @@ const Recipe = sequelize.define(
   "Recipe",
   {
     id_recipe: {
-      type: DataTypes.INTEGER(8),
+      type: DataTypes.INTEGER(11),
       primaryKey: true,
       autoIncrement: true,
       allowNull: false,

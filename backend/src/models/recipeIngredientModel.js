@@ -31,7 +31,13 @@ const RecipeIngredient = sequelize.define('RecipeIngredient', {
   }
 }, {
   tableName: 'recipe_ingredients',
-  timestamps: false  // No es necesario guardar timestamps para los ingredientes
+  timestamps: false,  // No es necesario guardar timestamps para los ingredientes
+  indexes: [
+    {
+      unique: true,  // Restricción de unicidad entre `ingredient_name` y `version_id`
+      fields: ['ingredient_name', 'version_id']
+    }
+  ]
 });
 
 RecipeVersion.hasMany(RecipeIngredient, { foreignKey: 'version_id' });
