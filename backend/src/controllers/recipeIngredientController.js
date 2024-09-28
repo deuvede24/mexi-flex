@@ -36,6 +36,19 @@ export const addIngredientToVersion = async (req, res) => {
   }
 };
 
+// src/controllers/recipeIngredientController.js
+
+// Obtener todos los ingredientes sin importar la versión
+export const getAllIngredients = async (req, res) => {
+  try {
+    const allIngredients = await RecipeIngredient.findAll();
+    res.json(allIngredients);
+  } catch (error) {
+    res.status(500).json({ error: "Error al obtener todos los ingredientes" });
+  }
+};
+
+
 // Actualizar un ingrediente de una versión de receta
 export const updateIngredient = async (req, res) => {
   const { ingredient_name, imperial_quantity, metric_quantity } = req.body;

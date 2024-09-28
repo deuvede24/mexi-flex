@@ -4,7 +4,7 @@ import Recipe from "./models/recipeModel.js";
 import RecipeVersion from './models/recipeVersionModel.js';
 import MapLocation from "./models/mapModel.js";
 import Event from "./models/eventModel.js";
-import RecipeIngredient from "./models/recipeIngredientModel.js"; // Importar el modelo de ingredientes
+import RecipeIngredient from "./models/recipeIngredientModel.js";
 
 const insertInitialData = async () => {
   try {
@@ -26,10 +26,18 @@ const insertInitialData = async () => {
       {
         title: "Tacos de Picadillo",
         description: "Tacos tradicionales con carne molida o Heura",
-        serving_size: 4,
+        serving_size: 1,
         preparation_time: 45,
         is_premium: 0,
         image: "tacos_picadillo.jpg",
+      },
+      {
+        title: "Flautas de Pollo",
+        description: "Flautas tradicionales con pollo o tofu.",
+        serving_size: 1,
+        preparation_time: 60,
+        is_premium: 0,
+        image: "flautas_pollo.jpg",
       },
     ];
 
@@ -43,45 +51,94 @@ const insertInitialData = async () => {
       attributes: ["id_recipe", "title"]
     });
 
-    if (!tacosPicadilloRecipe) throw new Error('Receta de tacos de picadillo no encontrada.');
+    const flautasPolloRecipe = await Recipe.findOne({
+      where: { title: "Flautas de Pollo" },
+      attributes: ["id_recipe", "title"]
+    });
 
-    // Insertar versiones de recetas (con bulkCreate y control de duplicados)
+    if (!tacosPicadilloRecipe || !flautasPolloRecipe) throw new Error('Receta no encontrada.');
+
+    // Insertar versiones de recetas (con for y control de duplicados)
     const versionData = [
       { recipe_id: tacosPicadilloRecipe.id_recipe, version_name: "tradicional", steps: JSON.stringify([{ descripcion: "Dorar la carne molida de ternera con cebolla y ajo." }, { descripcion: "Añadir tomate y cilantro." }]) },
       { recipe_id: tacosPicadilloRecipe.id_recipe, version_name: "flexi", steps: JSON.stringify([{ descripcion: "Dorar la carne de Heura con cebolla y ajo." }, { descripcion: "Añadir tomate y cilantro." }]) },
+      { recipe_id: flautasPolloRecipe.id_recipe, version_name: "tradicional", steps: JSON.stringify([{ descripcion: "Cocinar la pechuga de pollo y desmenuzarla." }, { descripcion: "Rellenar las tortillas con el pollo y freírlas hasta que estén doradas." }]) },
+      { recipe_id: flautasPolloRecipe.id_recipe, version_name: "flexi", steps: JSON.stringify([{ descripcion: "Rallar el tofu, sazonarlo y cocinarlo en la air fryer." }, { descripcion: "Rellenar las tortillas con el tofu y freírlas hasta que estén doradas." }]) },
     ];
 
-    await RecipeVersion.bulkCreate(versionData, { ignoreDuplicates: true });
+    for (const version of versionData) {
+      const existingVersion = await RecipeVersion.findOne({
+        where: { recipe_id: version.recipe_id, version_name: version.version_name },
+      });
 
-    const insertedVersions = await RecipeVersion.findAll({ where: { recipe_id: tacosPicadilloRecipe.id_recipe } });
+      if (!existingVersion) {
+        await RecipeVersion.create(version);
+        console.log(`Versión '${version.version_name}' insertada correctamente.`);
+      } else {
+        console.log(`Versión '${version.version_name}' ya existe, no se insertó.`);
+      }
+    }
+
+    const insertedVersions = await RecipeVersion.findAll({
+      where: {
+        recipe_id: [tacosPicadilloRecipe.id_recipe, flautasPolloRecipe.id_recipe]
+      }
+    });
 
     // Insertar ingredientes de versiones con bulkCreate
     const ingredientData = [
-      // Ingredientes de la versión tradicional
-      { ingredient_name: "Carne molida de ternera", imperial_quantity: "1 lb", metric_quantity: "500 g", version_id: insertedVersions.find(v => v.version_name === "tradicional").id_version },
-      { ingredient_name: "Cebolla", imperial_quantity: "1 unit", metric_quantity: "1 unidad", version_id: insertedVersions.find(v => v.version_name === "tradicional").id_version },
-      { ingredient_name: "Ajo", imperial_quantity: "2 cloves", metric_quantity: "2 dientes", version_id: insertedVersions.find(v => v.version_name === "tradicional").id_version },
-      { ingredient_name: "Tortillas de maíz", imperial_quantity: "12 units", metric_quantity: "12 unidades", version_id: insertedVersions.find(v => v.version_name === "tradicional").id_version },
-      { ingredient_name: "Cilantro", imperial_quantity: "To taste", metric_quantity: "Al gusto", version_id: insertedVersions.find(v => v.version_name === "tradicional").id_version },
-      { ingredient_name: "Tomate", imperial_quantity: "1 unit", metric_quantity: "1 unidad", version_id: insertedVersions.find(v => v.version_name === "tradicional").id_version },
-    
-      // Ingredientes de la versión flexi
-      { ingredient_name: "Carne de Heura", imperial_quantity: "1 lb", metric_quantity: "500 g", version_id: insertedVersions.find(v => v.version_name === "flexi").id_version },
-      { ingredient_name: "Cebolla", imperial_quantity: "1 unit", metric_quantity: "1 unidad", version_id: insertedVersions.find(v => v.version_name === "flexi").id_version }, // Compartido con la versión tradicional
-      { ingredient_name: "Ajo", imperial_quantity: "2 cloves", metric_quantity: "2 dientes", version_id: insertedVersions.find(v => v.version_name === "flexi").id_version },  // Compartido
-      { ingredient_name: "Tortillas de maíz", imperial_quantity: "12 units", metric_quantity: "12 unidades", version_id: insertedVersions.find(v => v.version_name === "flexi").id_version },  // Compartido
-      { ingredient_name: "Cilantro", imperial_quantity: "To taste", metric_quantity: "Al gusto", version_id: insertedVersions.find(v => v.version_name === "flexi").id_version },  // Compartido
-      { ingredient_name: "Tomate", imperial_quantity: "1 unit", metric_quantity: "1 unidad", version_id: insertedVersions.find(v => v.version_name === "flexi").id_version },  // Compartido
+    // Ingredientes de la versión tradicional de tacos
+    { ingredient_name: "Carne molida de ternera", imperial_quantity: "1/4 lb", metric_quantity: "125 g", version_id: insertedVersions.find(v => v.version_name === "tradicional" && v.recipe_id === tacosPicadilloRecipe.id_recipe).id_version },
+    { ingredient_name: "Cebolla", imperial_quantity: "1/4 unit", metric_quantity: "1/4 unidad", version_id: insertedVersions.find(v => v.version_name === "tradicional" && v.recipe_id === tacosPicadilloRecipe.id_recipe).id_version },
+    { ingredient_name: "Ajo", imperial_quantity: "1/2 clove", metric_quantity: "1/2 diente", version_id: insertedVersions.find(v => v.version_name === "tradicional" && v.recipe_id === tacosPicadilloRecipe.id_recipe).id_version },
+    { ingredient_name: "Tortillas de maíz", imperial_quantity: "3 units", metric_quantity: "3 unidades", version_id: insertedVersions.find(v => v.version_name === "tradicional" && v.recipe_id === tacosPicadilloRecipe.id_recipe).id_version },
+    { ingredient_name: "Cilantro", imperial_quantity: "To taste", metric_quantity: "Al gusto", version_id: insertedVersions.find(v => v.version_name === "tradicional" && v.recipe_id === tacosPicadilloRecipe.id_recipe).id_version },
+    { ingredient_name: "Tomate", imperial_quantity: "1/4 unit", metric_quantity: "1/4 unidad", version_id: insertedVersions.find(v => v.version_name === "tradicional" && v.recipe_id === tacosPicadilloRecipe.id_recipe).id_version },
+
+    // Ingredientes de la versión flexi de tacos
+    { ingredient_name: "Carne de Heura", imperial_quantity: "1/4 lb", metric_quantity: "125 g", version_id: insertedVersions.find(v => v.version_name === "flexi" && v.recipe_id === tacosPicadilloRecipe.id_recipe).id_version },
+    { ingredient_name: "Cebolla", imperial_quantity: "1/4 unit", metric_quantity: "1/4 unidad", version_id: insertedVersions.find(v => v.version_name === "flexi" && v.recipe_id === tacosPicadilloRecipe.id_recipe).id_version },
+    { ingredient_name: "Ajo", imperial_quantity: "1/2 clove", metric_quantity: "1/2 diente", version_id: insertedVersions.find(v => v.version_name === "flexi" && v.recipe_id === tacosPicadilloRecipe.id_recipe).id_version },
+    { ingredient_name: "Tortillas de maíz", imperial_quantity: "3 units", metric_quantity: "3 unidades", version_id: insertedVersions.find(v => v.version_name === "flexi" && v.recipe_id === tacosPicadilloRecipe.id_recipe).id_version },
+    { ingredient_name: "Cilantro", imperial_quantity: "To taste", metric_quantity: "Al gusto", version_id: insertedVersions.find(v => v.version_name === "flexi" && v.recipe_id === tacosPicadilloRecipe.id_recipe).id_version },
+    { ingredient_name: "Tomate", imperial_quantity: "1/4 unit", metric_quantity: "1/4 unidad", version_id: insertedVersions.find(v => v.version_name === "flexi" && v.recipe_id === tacosPicadilloRecipe.id_recipe).id_version },
+
+    // Ingredientes de la versión tradicional de flautas
+    { ingredient_name: "Pechuga de pollo", imperial_quantity: "1/4 unit", metric_quantity: "1/4 unidad", version_id: insertedVersions.find(v => v.version_name === "tradicional" && v.recipe_id === flautasPolloRecipe.id_recipe).id_version },
+    { ingredient_name: "Tortillas de maíz", imperial_quantity: "3 units", metric_quantity: "3 unidades", version_id: insertedVersions.find(v => v.version_name === "tradicional" && v.recipe_id === flautasPolloRecipe.id_recipe).id_version },
+    { ingredient_name: "Aceite", imperial_quantity: "To fry", metric_quantity: "Para freír", version_id: insertedVersions.find(v => v.version_name === "tradicional" && v.recipe_id === flautasPolloRecipe.id_recipe).id_version },
+    { ingredient_name: "Salsa verde", imperial_quantity: "To serve", metric_quantity: "Para acompañar", version_id: insertedVersions.find(v => v.version_name === "tradicional" && v.recipe_id === flautasPolloRecipe.id_recipe).id_version },
+    { ingredient_name: "Aguacate", imperial_quantity: "1/4 unit", metric_quantity: "1/4 unidad", version_id: insertedVersions.find(v => v.version_name === "tradicional" && v.recipe_id === flautasPolloRecipe.id_recipe).id_version },
+    { ingredient_name: "Lechuga", imperial_quantity: "1/4 cup", metric_quantity: "1/4 taza", version_id: insertedVersions.find(v => v.version_name === "tradicional" && v.recipe_id === flautasPolloRecipe.id_recipe).id_version },
+    { ingredient_name: "Tomate", imperial_quantity: "1/4 unit", metric_quantity: "1/4 unidad", version_id: insertedVersions.find(v => v.version_name === "tradicional" && v.recipe_id === flautasPolloRecipe.id_recipe).id_version },
+    { ingredient_name: "Limón", imperial_quantity: "1/2 unit", metric_quantity: "1/2 unidad", version_id: insertedVersions.find(v => v.version_name === "tradicional" && v.recipe_id === flautasPolloRecipe.id_recipe).id_version },
+    { ingredient_name: "Queso fresco rallado", imperial_quantity: "1/4 cup", metric_quantity: "1/4 taza", version_id: insertedVersions.find(v => v.version_name === "tradicional" && v.recipe_id === flautasPolloRecipe.id_recipe).id_version },
+    { ingredient_name: "Nata espesa", imperial_quantity: "1/8 cup", metric_quantity: "1/8 taza", version_id: insertedVersions.find(v => v.version_name === "tradicional" && v.recipe_id === flautasPolloRecipe.id_recipe).id_version },
+
+    // Ingredientes de la versión flexi de flautas
+    { ingredient_name: "Tofu", imperial_quantity: "1/4 lb", metric_quantity: "125 g", version_id: insertedVersions.find(v => v.version_name === "flexi" && v.recipe_id === flautasPolloRecipe.id_recipe).id_version },
+    { ingredient_name: "Tortillas de maíz", imperial_quantity: "3 units", metric_quantity: "3 unidades", version_id: insertedVersions.find(v => v.version_name === "flexi" && v.recipe_id === flautasPolloRecipe.id_recipe).id_version },
+    { ingredient_name: "Aceite", imperial_quantity: "To fry", metric_quantity: "Para freír", version_id: insertedVersions.find(v => v.version_name === "flexi" && v.recipe_id === flautasPolloRecipe.id_recipe).id_version },
+    { ingredient_name: "Salsa verde", imperial_quantity: "To serve", metric_quantity: "Para acompañar", version_id: insertedVersions.find(v => v.version_name === "flexi" && v.recipe_id === flautasPolloRecipe.id_recipe).id_version },
+    { ingredient_name: "Aguacate", imperial_quantity: "1/4 unit", metric_quantity: "1/4 unidad", version_id: insertedVersions.find(v => v.version_name === "flexi" && v.recipe_id === flautasPolloRecipe.id_recipe).id_version },
+    { ingredient_name: "Lechuga", imperial_quantity: "1/4 cup", metric_quantity: "1/4 taza", version_id: insertedVersions.find(v => v.version_name === "flexi" && v.recipe_id === flautasPolloRecipe.id_recipe).id_version },
+    { ingredient_name: "Tomate", imperial_quantity: "1/4 unit", metric_quantity: "1/4 unidad", version_id: insertedVersions.find(v => v.version_name === "flexi" && v.recipe_id === flautasPolloRecipe.id_recipe).id_version },
+    { ingredient_name: "Limón", imperial_quantity: "1/2 unit", metric_quantity: "1/2 unidad", version_id: insertedVersions.find(v => v.version_name === "flexi" && v.recipe_id === flautasPolloRecipe.id_recipe).id_version },
+    { ingredient_name: "Queso fresco rallado", imperial_quantity: "1/4 cup", metric_quantity: "1/4 taza", version_id: insertedVersions.find(v => v.version_name === "flexi" && v.recipe_id === flautasPolloRecipe.id_recipe).id_version },
+    { ingredient_name: "Nata espesa", imperial_quantity: "1/8 cup", metric_quantity: "1/8 taza", version_id: insertedVersions.find(v => v.version_name === "flexi" && v.recipe_id === flautasPolloRecipe.id_recipe).id_version },
     ];
-    
 
     await RecipeIngredient.bulkCreate(ingredientData, { ignoreDuplicates: true });
     console.log("Ingredientes insertados correctamente.");
 
     // Insertar ubicaciones en el mapa
     const mapLocationData = [
-      { name: "La Sagrada Familia", description: "Una famosa basílica diseñada por Antoni Gaudí.", latitude: 41.4036, longitude: 2.1744 },
-      { name: "Parc Güell", description: "Un parque público con impresionantes obras de Gaudí.", latitude: 41.4145, longitude: 2.1527 },
+      { name: "La Sagrada Familia", description: "Una famosa basílica diseñada por Antoni Gaudí.", latitude: 41.4036, longitude: 2.1744, category: 'park' },
+      { name: "Parc Güell", description: "Un parque público con impresionantes obras de Gaudí.", latitude: 41.4145, longitude: 2.1527, category: 'park' },
+      { name: "Casa Batlló", description: "Un edificio modernista diseñado por Gaudí.", latitude: 41.3916, longitude: 2.1649, category: 'Museos' },
+      { name: "Barrio Gótico", description: "El casco antiguo de Barcelona con calles estrechas y mucha historia.", latitude: 41.3833, longitude: 2.1833, category: 'Museos' },
+      { name: "Museo Picasso", description: "Un museo dedicado a las obras del pintor Pablo Picasso.", latitude: 41.3851, longitude: 2.1805, category: 'Museos' },
+      { name: "Plaza Catalunya", description: "Un punto central de Barcelona con tiendas y restaurantes.", latitude: 41.3879, longitude: 2.16992, category: 'park' },
     ];
 
     await MapLocation.bulkCreate(mapLocationData, { ignoreDuplicates: true });
@@ -102,5 +159,6 @@ const insertInitialData = async () => {
 };
 
 export default insertInitialData;
+
 
 

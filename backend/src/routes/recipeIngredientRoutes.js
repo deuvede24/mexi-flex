@@ -17,6 +17,7 @@ export default router;*/
 import { Router } from "express";
 import {
   getIngredientsByVersion,
+  getAllIngredients,
   addIngredientToVersion,
   updateIngredient,
   deleteIngredient
@@ -31,6 +32,12 @@ router.get(
   "/versions/:versionId/ingredients",
   authenticateToken(["user", "admin"]),
   getIngredientsByVersion
+);
+
+router.get(
+  "/all",
+  authenticateToken(["admin"]),  // Solo los admin pueden ver esto, puedes ajustar el rol si es necesario
+  getAllIngredients  // Usamos el controlador para manejar la lógica
 );
 
 // Añadir un ingrediente a una versión de receta (solo admin)
