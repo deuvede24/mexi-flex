@@ -23,7 +23,9 @@ import {
   deleteIngredient
 } from "../controllers/recipeIngredientController.js";
 import { authenticateToken } from "../middlewares/authenticateToken.js";
-import { recipeIngredientValidator } from "../validations/recipeIngredientValidation.js";
+//import { recipeIngredientValidator } from "../validations/recipeIngredientValidation.js";
+import { recipeValidator } from "../validations/recipeValidation.js"; 
+
 
 const router = Router();
 
@@ -44,7 +46,7 @@ router.get(
 router.post(
   "/versions/:versionId/ingredients",
   authenticateToken(["admin"]),
-  recipeIngredientValidator,
+  recipeValidator,
   addIngredientToVersion
 );
 
@@ -52,7 +54,7 @@ router.post(
 router.put(
   "/ingredients/:ingredientId",
   authenticateToken(["admin"]),
-  recipeIngredientValidator,
+  recipeValidator,
   updateIngredient
 );
 
