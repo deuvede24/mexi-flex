@@ -1,4 +1,4 @@
-<p>view-recipe works!</p>
+<!--<p>view-recipe works!</p>
 <div class="container mt-4">
     <h2 class="mb-4">Recipe Details</h2>
   
@@ -36,4 +36,58 @@
       <button class="btn btn-primary" routerLink="/recipes">Back to Recipes</button>
     </div>
   </div>
-  
+-->
+<div class="container mt-4">
+  <h2 class="mb-4">{{ recipe?.title }}</h2>
+
+  <table class="table table-bordered">
+    <thead>
+      <tr class="table-primary">
+        <th colspan="2">Detalles de la Receta</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <th scope="row">Descripción</th>
+        <td>{{ recipe?.description }}</td>
+      </tr>
+      <tr>
+        <th scope="row">Premium</th>
+        <td>{{ recipe?.is_premium ? 'Sí' : 'No' }}</td>
+      </tr>
+      <tr>
+        <th scope="row">Tamaño de porción</th>
+        <td>{{ recipe?.serving_size }}</td>
+      </tr>
+      <tr>
+        <th scope="row">Tiempo de preparación</th>
+        <td>{{ recipe?.preparation_time }} minutos</td>
+      </tr>
+      <tr>
+        <th scope="row">Imagen</th>
+        <td><img [src]="recipe?.image" alt="{{ recipe?.title }}" style="max-width: 100px;"/></td>
+      </tr>
+    </tbody>
+  </table>
+
+  <h3>Versiones</h3>
+  <div *ngFor="let version of recipe?.versions">
+    <h4>{{ version.version_name }}</h4>
+    <h5>Pasos:</h5>
+    <ul>
+      @for (step of version.steps; track step) {
+        <li>{{ step.description }}</li>
+      }
+    </ul>
+    <h5>Ingredientes:</h5>
+    <ul>
+      @for (ingredient of version.ingredients; track ingredient) {
+        <li>{{ ingredient.ingredient_name }} - {{ ingredient.imperial_quantity }} / {{ ingredient.metric_quantity }}</li>
+      }
+    </ul>
+  </div>
+
+  <div class="mt-3">
+    <button class="btn btn-primary" routerLink="/recipes">Volver a Recetas</button>
+  </div>
+</div>

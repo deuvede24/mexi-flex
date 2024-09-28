@@ -9,7 +9,7 @@ import { ProgressBarComponent } from '../../shared/progress-bar/progress-bar.com
 import { AuthService } from '../../services/auth.service';
 import { NotificationService } from '../../services/notification.service'; // Reemplazamos ToastrService
 
-@Component({
+/*@Component({
   selector: 'app-add-edit-recipe',
   standalone: true,
   imports: [CommonModule, RouterModule, ReactiveFormsModule, ProgressBarComponent],
@@ -96,30 +96,7 @@ export class AddEditRecipeComponent implements OnInit {
   removeStep(index: number) {
     this.getSteps().removeAt(index);
   }
-
-
-
-
-  /*getRecipeById(id: number) {
-    this.loading = true;
-    this.recipeService.getRecipeById(id).subscribe({
-      next: (response: { code: number; message: string; data: Recipe }) => {
-        this.form.patchValue({
-          title: response.data.title || '',
-          description: response.data.description || '',
-          steps: response.data.steps || '',
-          category: response.data.category || '',
-          is_premium: response.data.is_premium || false,
-          ingredients: response.data.ingredients || '',
-        });
-        this.loading = false;
-      },
-      error: () => {
-        this.notificationService.showError('Error al cargar la receta.');
-        this.loading = false;
-      }
-    });
-  }*/
+ 
   getRecipeById(id: number) {
     this.loading = true;
     this.recipeService.getRecipeById(id).subscribe({
@@ -167,66 +144,7 @@ export class AddEditRecipeComponent implements OnInit {
       }
     });
   }
-  /*getRecipeById(id: number) {
-    this.loading = true;
-    this.recipeService.getRecipeById(id).subscribe({
-      next: (response: { code: number; message: string; data: Recipe }) => {
-        const recipeData = response.data;
-        console.log('Datos recibidos de la receta:', recipeData);
-  
-        // Asegurarse de que ingredients es un array o convertirlo desde JSON
-        let ingredientsArray = [];
-        try {
-          ingredientsArray = Array.isArray(recipeData.ingredients)
-            ? recipeData.ingredients
-            : JSON.parse(recipeData.ingredients || '[]');
-        } catch (error) {
-          console.error('Error al parsear los ingredientes:', error);
-        }
-  
-        ingredientsArray.forEach((ingredient: { nombre: string, cantidad: { imperial: string, metric: string }}) => {
-          this.getIngredients().push(this.fb.group({
-            nombre: [ingredient.nombre, Validators.required],
-            cantidadImperial: [ingredient.cantidad.imperial, Validators.required],
-            cantidadMetric: [ingredient.cantidad.metric, Validators.required]
-          }));
-        });
-  
-        // Asegurarse de que steps es un array o convertirlo desde JSON
-        let stepsArray = [];
-        try {
-          stepsArray = Array.isArray(recipeData.steps)
-            ? recipeData.steps
-            : JSON.parse(recipeData.steps || '[]');
-        } catch (error) {
-          console.error('Error al parsear los pasos:', error);
-        }
-  
-        stepsArray.forEach((step: { descripcion: string }) => {
-          this.getSteps().push(this.fb.group({
-            descripcion: [step.descripcion, Validators.required]
-          }));
-        });
-  
-        this.form.patchValue({
-          title: recipeData.title,
-          description: recipeData.description,
-          category: recipeData.category,
-          is_premium: recipeData.is_premium,
-          serving_size: recipeData.serving_size,
-          preparation_time: recipeData.preparation_time,
-          image: recipeData.image
-        });
-  
-        this.loading = false;
-      },
-      error: () => {
-        this.notificationService.showError('Error al cargar la receta.');
-        this.loading = false;
-      }
-    });
-  }*/
-
+ 
   saveRecipe() {
     if (this.form.invalid) {
       this.notificationService.showError('Por favor, complete todos los campos.');
@@ -281,7 +199,178 @@ export class AddEditRecipeComponent implements OnInit {
       });
     }
   }
-  /*saveRecipe() {
+ 
+
+  cancel() {
+    this.router.navigate(['/recipes']);
+  }
+}*/
+
+
+
+@Component({
+  selector: 'app-add-edit-recipe',
+  standalone: true,
+  imports: [CommonModule, RouterModule, ReactiveFormsModule, ProgressBarComponent],
+  templateUrl: './add-edit-recipe.component.html',
+  styleUrls: ['./add-edit-recipe.component.scss']
+})
+export class AddEditRecipeComponent implements OnInit {
+  form: FormGroup;
+  loading = false;
+  id: number;
+
+  constructor(
+    private fb: FormBuilder,
+    private recipeService: RecipeService,
+    private router: Router,
+    private notificationService: NotificationService,
+    private aRouter: ActivatedRoute,
+    public authService: AuthService
+  ) {
+    this.form = this.fb.group({
+      title: ['', Validators.required],
+      description: ['', Validators.required],
+      is_premium: [false, Validators.required],
+      serving_size: [1, Validators.required],
+      preparation_time: [0, Validators.required],
+      image: [''],  // Campo para la URL de la imagen
+      versions: this.fb.array([]),  // Array de versiones
+    });
+
+    this.id = Number(this.aRouter.snapshot.paramMap.get('id') || 0);
+  }
+
+  ngOnInit(): void {
+    if (this.id !== 0) {
+      this.getRecipeById(this.id);
+    }
+  }
+
+  // Obtener el array de versiones del formulario
+  getVersions(): FormArray {
+    return this.form.get('versions') as FormArray;
+  }
+
+  // Obtener el array de ingredientes de una versión específica
+  getIngredients(versionIndex: number): FormArray {
+    return this.getVersions().at(versionIndex).get('ingredients') as FormArray;
+  }
+
+  // Obtener el array de pasos de una versión específica
+  getSteps(versionIndex: number): FormArray {
+    return this.getVersions().at(versionIndex).get('steps') as FormArray;
+  }
+
+  // Función para crear un control de versión
+  createVersion(): FormGroup {
+    return this.fb.group({
+      version_name: ['', Validators.required],
+      ingredients: this.fb.array([]),  // Array de ingredientes para esta versión
+      steps: this.fb.array([]),  // Array de pasos para esta versión
+    });
+  }
+
+  // Función para crear un control de ingrediente
+  createIngredient(): FormGroup {
+    return this.fb.group({
+      ingredient_name: ['', Validators.required],
+      imperial_quantity: ['', Validators.required],
+      metric_quantity: ['', Validators.required]
+    });
+  }
+
+  // Función para crear un control de paso
+  createStep(): FormGroup {
+    return this.fb.group({
+      description: ['', Validators.required]
+    });
+  }
+
+  // Añadir una versión al array de versiones
+  addVersion() {
+    this.getVersions().push(this.createVersion());
+  }
+
+  // Eliminar una versión
+  removeVersion(index: number) {
+    this.getVersions().removeAt(index);
+  }
+
+  // Añadir un ingrediente a una versión específica
+  addIngredient(versionIndex: number) {
+    this.getIngredients(versionIndex).push(this.createIngredient());
+  }
+
+  // Eliminar un ingrediente de una versión específica
+  removeIngredient(versionIndex: number, ingredientIndex: number) {
+    this.getIngredients(versionIndex).removeAt(ingredientIndex);
+  }
+
+  // Añadir un paso a una versión específica
+  addStep(versionIndex: number) {
+    this.getSteps(versionIndex).push(this.createStep());
+  }
+
+  // Eliminar un paso de una versión específica
+  removeStep(versionIndex: number, stepIndex: number) {
+    this.getSteps(versionIndex).removeAt(stepIndex);
+  }
+
+  // Obtener los datos de la receta por ID
+  getRecipeById(id: number) {
+    this.loading = true;
+    this.recipeService.getRecipeById(id).subscribe({
+      next: (response: { code: number; message: string; data: Recipe }) => {
+        const recipeData = response.data;
+
+        this.form.patchValue({
+          title: recipeData.title,
+          description: recipeData.description,
+          is_premium: recipeData.is_premium,
+          serving_size: recipeData.serving_size,
+          preparation_time: recipeData.preparation_time,
+          image: recipeData.image
+        });
+
+        this.getVersions().clear();
+        recipeData.versions.forEach((version) => {
+          const versionGroup = this.createVersion();
+          versionGroup.patchValue({
+            version_name: version.version_name,
+          });
+
+          this.getIngredients(this.getVersions().length - 1).clear();
+          this.getSteps(this.getVersions().length - 1).clear();
+
+          version.ingredients.forEach((ingredient) => {
+            this.getIngredients(this.getVersions().length - 1).push(this.fb.group({
+              ingredient_name: ingredient.ingredient_name,
+              imperial_quantity: ingredient.imperial_quantity,
+              metric_quantity: ingredient.metric_quantity
+            }));
+          });
+
+          version.steps.forEach((step) => {
+            this.getSteps(this.getVersions().length - 1).push(this.fb.group({
+              description: step.description
+            }));
+          });
+
+          this.getVersions().push(versionGroup);
+        });
+
+        this.loading = false;
+      },
+      error: () => {
+        this.notificationService.showError('Error al cargar la receta.');
+        this.loading = false;
+      }
+    });
+  }
+
+  // Guardar o actualizar la receta
+  saveRecipe() {
     if (this.form.invalid) {
       this.notificationService.showError('Por favor, complete todos los campos.');
       return;
@@ -289,23 +378,22 @@ export class AddEditRecipeComponent implements OnInit {
 
     const formValue = this.form.value;
 
-    // Convertir el array de ingredientes a JSON
-    formValue.ingredients = formValue.ingredients.map(
-      (ingredient: { nombre: string, cantidadImperial: string, cantidadMetric: string }) => ({
-        nombre: ingredient.nombre,
-        cantidad: {
-          imperial: ingredient.cantidadImperial,
-          metric: ingredient.cantidadMetric
-        }
-      })
-    );
+    const recipe = {
+      id: this.id,
+      ...formValue,
+      versions: formValue.versions.map((version: any) => ({
+        version_name: version.version_name,
+        steps: version.steps.map((step: any) => ({
+          description: step.description
+        })),
+        ingredients: version.ingredients.map((ingredient: any) => ({
+          ingredient_name: ingredient.ingredient_name,
+          imperial_quantity: ingredient.imperial_quantity,
+          metric_quantity: ingredient.metric_quantity
+        }))
+      }))
+    };
 
-    // Convertir el array de steps a JSON
-    formValue.steps = formValue.steps.map((step: { descripcion: string }) => ({
-      descripcion: step.descripcion
-    }));
-
-    const recipe = { id: this.id, ...formValue };
     this.loading = true;
 
     if (this.id !== 0) {
@@ -333,7 +421,7 @@ export class AddEditRecipeComponent implements OnInit {
         }
       });
     }
-  }*/
+  }
 
   cancel() {
     this.router.navigate(['/recipes']);

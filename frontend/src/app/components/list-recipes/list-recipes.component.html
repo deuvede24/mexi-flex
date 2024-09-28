@@ -1,5 +1,5 @@
 
-<div class="container mt-4">
+<!--<div class="container mt-4">
     <div class="card border-secondary">
       <div class="card-header bg-primary text-white d-flex justify-content-between">
         <h4>Listado de Recetas</h4>
@@ -9,7 +9,7 @@
         </div>
       </div>
       <div class="card-body">
-        <div class="table-responsive"> <!-- Asegurar que la tabla sea scrollable -->
+        <div class="table-responsive"> 
           <table class="table table-hover table-bordered">
             <thead class="table-dark">
               <tr>
@@ -48,5 +48,134 @@
         </div>
       </div>
     </div>
+  </div>-->
+ 
+ 
+ <!-- <div class="container mt-4">
+    <div class="card border-secondary">
+      <div class="card-header bg-primary text-white d-flex justify-content-between">
+        <h4>Listado de Recetas</h4>
+        <div>
+          <button class="btn btn-info me-2" (click)="downloadCSV()">Descargar CSV</button>
+          <button class="btn btn-success" (click)="addRecipe()">Añadir Ítem</button>
+        </div>
+      </div>
+      <div class="card-body">
+        <div class="table-responsive">
+          <table class="table table-hover table-bordered">
+            <thead class="table-dark">
+              <tr>
+                <th scope="col">Título</th>
+                <th scope="col">Descripción</th>
+                <th scope="col">Versiones</th>
+                <th scope="col">Premium</th>
+                <th scope="col">Acciones</th>
+              </tr>
+            </thead>
+            <tbody>
+            
+              @if (recipeList.length > 0) {
+               
+                @for (recipe of recipeList; track recipe.id_recipe) {
+                  <tr class="table-dark">
+                    <td>{{ recipe.title }}</td>
+                    <td>{{ recipe.description }}</td>
+                    <td>
+                    
+                      @if (recipe.versions && recipe.versions.length > 0) {
+                        <div>
+                          <strong>{{ recipe.versions[0]?.version_name }}</strong> 
+                          <ul>
+                           
+                            @if (recipe.versions[0].steps && recipe.versions[0].steps.length > 0) {
+                              @for (stepIndex = 0; stepIndex < recipe.versions[0].steps.length; stepIndex++) {
+                                <li>{{ recipe.versions[0].steps[stepIndex].description }}</li>
+                              }
+                            } @else {
+                              <li>No hay pasos disponibles</li>
+                            }
+                          </ul>
+                          <ul>
+                          
+                            @if (recipe.versions[0].ingredients && recipe.versions[0].ingredients.length > 0) {
+                              @for (ingredientIndex = 0; ingredientIndex < recipe.versions[0].ingredients.length; ingredientIndex++) {
+                                <li>{{ recipe.versions[0].ingredients[ingredientIndex].ingredient_name }} - 
+                                    {{ recipe.versions[0].ingredients[ingredientIndex].imperial_quantity }} / 
+                                    {{ recipe.versions[0].ingredients[ingredientIndex].metric_quantity }}
+                                </li>
+                              }
+                            } @else {
+                              <li>No hay ingredientes disponibles</li>
+                            }
+                          </ul>
+                        </div>
+                      } @else {
+                        <div>No hay versiones disponibles</div>
+                      }
+                    </td>
+                    <td>{{ recipe.is_premium ? 'Sí' : 'No' }}</td>
+                    <td class="d-flex justify-content-around align-items-center">
+                      <button class="btn btn-info btn-sm" (click)="editRecipe(recipe.id_recipe)">Editar</button>
+                      <button class="btn btn-danger btn-sm ms-2" (click)="deleteRecipe(recipe.id_recipe)">Eliminar</button>
+                    </td>
+                  </tr>
+                }
+              } @else {
+                <tr>
+                  <td colspan="5" class="text-center">No hay recetas disponibles.</td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
   </div>
+-->
+
+<div class="container mt-4">
+  <div class="card border-secondary">
+    <div class="card-header bg-primary text-white d-flex justify-content-between">
+      <h4>Listado de Recetas</h4>
+      <div>
+        <button class="btn btn-info me-2" (click)="downloadCSV()">Descargar CSV</button>
+        <button class="btn btn-success" (click)="addRecipe()">Añadir Ítem</button>
+      </div>
+    </div>
+    <div class="card-body">
+      <div class="table-responsive">
+        <table class="table table-hover table-bordered">
+          <thead class="table-dark">
+            <tr>
+              <th scope="col">Título</th>
+              <th scope="col">Descripción</th>
+              <th scope="col">Acciones</th>
+            </tr>
+          </thead>
+          <tbody>
+            <!-- Verificar si hay recetas disponibles -->
+            @if (recipeList.length > 0) {
+              <!-- Iterar sobre las recetas -->
+              @for (recipe of recipeList; track recipe.id_recipe) {
+                <tr class="table-dark">
+                  <td>{{ recipe.title }}</td>
+                  <td>{{ recipe.description }}</td>
+                  <td class="d-flex justify-content-around align-items-center">
+                    <button class="btn btn-info btn-sm" (click)="editRecipe(recipe.id_recipe)">Editar</button>
+                    <button class="btn btn-danger btn-sm ms-2" (click)="deleteRecipe(recipe.id_recipe)">Eliminar</button>
+                  </td>
+                </tr>
+              }
+            } @else {
+              <tr>
+                <td colspan="3" class="text-center">No hay recetas disponibles.</td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+
   
