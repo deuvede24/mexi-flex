@@ -15,7 +15,7 @@ export interface RecipeVersion {
   id_version: number;
   version_name: string;
   steps: Step[];
-  ingredients: RecipeIngredient[];  // Relación con los ingredientes
+  RecipeIngredients: RecipeIngredient[];  // Relación con los ingredientes
 }
 
 
@@ -49,6 +49,6 @@ export interface Recipe {
   preparation_time: number;
   image?: string;
   created_at: Date;
-  versions: RecipeVersion[];  // Relación con las versiones
+  RecipeVersions: RecipeVersion[];  // Relación con las versiones
 }
 

@@ -44,6 +44,9 @@ export const getRecipeById = async (req, res) => {
       }
     });
 
+// Añadir console.log para verificar lo que devuelve la base de datos
+    console.log('Recipe retrieved from DB:', recipe);
+
     if (!recipe) {
       return res.status(404).json({
         code: -3,

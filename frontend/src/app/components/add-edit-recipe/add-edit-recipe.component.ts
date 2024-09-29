@@ -3,7 +3,7 @@ import { CommonModule } from '@angular/common';
 import { RouterModule, Router } from '@angular/router';
 import { ReactiveFormsModule, FormBuilder, FormGroup, Validators, FormArray } from '@angular/forms';
 import { RecipeService } from '../../services/recipe.service';
-import { Recipe } from '../../interfaces/recipe.interface';
+import { Recipe, RecipeVersion, RecipeIngredient, Step } from '../../interfaces/recipe.interface';
 import { ActivatedRoute } from '@angular/router';
 import { ProgressBarComponent } from '../../shared/progress-bar/progress-bar.component';
 import { AuthService } from '../../services/auth.service';
@@ -318,7 +318,7 @@ export class AddEditRecipeComponent implements OnInit {
   }
 
   // Obtener los datos de la receta por ID
-  getRecipeById(id: number) {
+  /*getRecipeById(id: number) {
     this.loading = true;
     this.recipeService.getRecipeById(id).subscribe({
       next: (response: { code: number; message: string; data: Recipe }) => {
@@ -368,8 +368,95 @@ export class AddEditRecipeComponent implements OnInit {
       }
     });
   }
+*/
+  
 
-  // Guardar o actualizar la receta
+getRecipeById(id: number) {
+  this.recipeService.getRecipeById(id).subscribe({
+    next: (response: { code: number; message: string; data: Recipe }) => {
+      const recipeData = response.data;
+
+      console.log('Recipe Data received from API:', recipeData); // Verifica la estructura completa de los datos recibidos
+
+      // Parchear el formulario principal con los datos de la receta
+      this.form.patchValue({
+        title: recipeData.title,
+        description: recipeData.description,
+        is_premium: recipeData.is_premium,
+        serving_size: recipeData.serving_size,
+        preparation_time: recipeData.preparation_time,
+        image: recipeData.image
+      });
+      console.log('Form after patching:', this.form.value);
+
+      // Limpiar las versiones actuales en el formulario
+      this.getVersions().clear();
+      console.log('Form versions cleared:', this.getVersions().value);
+
+      // Cambiamos aquí para usar 'RecipeVersions' en lugar de 'versions'
+      if (recipeData.RecipeVersions && recipeData.RecipeVersions.length > 0) {
+        console.log(`Found ${recipeData.RecipeVersions.length} versions for the recipe.`);
+
+        recipeData.RecipeVersions.forEach((version, versionIndex) => {
+          console.log(`Processing version ${versionIndex + 1}:`, version);
+
+          const versionGroup = this.createVersion();
+          versionGroup.patchValue({
+            version_name: version.version_name,
+          });
+          console.log('Version group after patchValue:', versionGroup.value);
+
+          // Verificar si la versión tiene ingredientes antes de iterar sobre ellos
+          if (version.RecipeIngredients && version.RecipeIngredients.length > 0) {
+            console.log(`Found ${version.RecipeIngredients.length} ingredients for version: ${version.version_name}`);
+
+            version.RecipeIngredients.forEach((ingredient, ingredientIndex) => {
+              console.log(`Processing ingredient ${ingredientIndex + 1}:`, ingredient);
+              this.getIngredients(this.getVersions().length).push({
+                ingredient_name: ingredient.ingredient_name,
+                imperial_quantity: ingredient.imperial_quantity,
+                metric_quantity: ingredient.metric_quantity
+              });
+              console.log('Ingredients FormArray after push:', this.getIngredients(this.getVersions().length).value);
+            });
+          } else {
+            console.log(`No ingredients found for version: ${version.version_name}`);
+          }
+
+          // **Verificación adicional de los pasos antes de procesarlos**
+          console.log(`Raw steps for version ${version.version_name}:`, version.steps);
+          if (version.steps && version.steps.length > 0) {
+            console.log(`Found ${version.steps.length} steps for version: ${version.version_name}`);
+            version.steps.forEach((step, stepIndex) => {
+              console.log(`Processing step ${stepIndex + 1}:`, step);
+              this.getSteps(this.getVersions().length).push({
+                description: step.description // Asegúrate de que 'descripcion' es el campo correcto
+              });
+              console.log('Steps FormArray after push:', this.getSteps(this.getVersions().length).value);
+            });
+          } else {
+            console.log(`No steps found for version: ${version.version_name}`);
+          }
+
+          // Finalmente, agregar el grupo de versión al formulario
+          console.log(`Adding version ${version.version_name} to the form.`);
+          this.getVersions().push(versionGroup);
+          console.log('Form versions after push:', this.getVersions().value);
+        });
+      } else {
+        console.log('No versions found for recipe.');
+      }
+    },
+    error: (error) => {
+      console.error('Error retrieving recipe:', error);
+    },
+  });
+}
+
+
+
+
+// Guardar o actualizar la receta
   saveRecipe() {
     if (this.form.invalid) {
       this.notificationService.showError('Por favor, complete todos los campos.');

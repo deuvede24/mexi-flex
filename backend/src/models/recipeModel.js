@@ -3,6 +3,7 @@ import { DataTypes } from "sequelize";
 import { sequelize } from "../db.js";
 import User from "./userModel.js";
 
+
 const Recipe = sequelize.define(
   "Recipe",
   {

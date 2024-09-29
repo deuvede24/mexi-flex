@@ -39,38 +39,72 @@ const insertInitialData = async () => {
         is_premium: 0,
         image: "flautas_pollo.jpg",
       },
+      {
+        title: "Tacos de Chicharrón Prensado",
+        description: "Tacos tradicionales con chicharrón prensado o tofu marinado.",
+        serving_size: 1,
+        preparation_time: 40,
+        is_premium: 0,
+        image: "tacos_chicharron.jpg",
+      }
     ];
-
+    
     await Recipe.bulkCreate(recipeData, {
       ignoreDuplicates: true,
       updateOnDuplicate: ["title", "description", "serving_size", "preparation_time", "is_premium", "image"],
     });
-
+    
     const tacosPicadilloRecipe = await Recipe.findOne({
       where: { title: "Tacos de Picadillo" },
       attributes: ["id_recipe", "title"]
     });
-
+    
     const flautasPolloRecipe = await Recipe.findOne({
       where: { title: "Flautas de Pollo" },
       attributes: ["id_recipe", "title"]
     });
-
+    const tacosChicharronRecipe = await Recipe.findOne({
+      where: { title: "Tacos de Chicharrón Prensado" },
+      attributes: ["id_recipe", "title"]
+    });
+    
+    if (!tacosChicharronRecipe) throw new Error('Receta Tacos de Chicharrón Prensado no encontrada.');
     if (!tacosPicadilloRecipe || !flautasPolloRecipe) throw new Error('Receta no encontrada.');
-
-    // Insertar versiones de recetas (con for y control de duplicados)
+    
+    // Insertar versiones de recetas sin JSON.stringify
     const versionData = [
-      { recipe_id: tacosPicadilloRecipe.id_recipe, version_name: "tradicional", steps: JSON.stringify([{ descripcion: "Dorar la carne molida de ternera con cebolla y ajo." }, { descripcion: "Añadir tomate y cilantro." }]) },
-      { recipe_id: tacosPicadilloRecipe.id_recipe, version_name: "flexi", steps: JSON.stringify([{ descripcion: "Dorar la carne de Heura con cebolla y ajo." }, { descripcion: "Añadir tomate y cilantro." }]) },
-      { recipe_id: flautasPolloRecipe.id_recipe, version_name: "tradicional", steps: JSON.stringify([{ descripcion: "Cocinar la pechuga de pollo y desmenuzarla." }, { descripcion: "Rellenar las tortillas con el pollo y freírlas hasta que estén doradas." }]) },
-      { recipe_id: flautasPolloRecipe.id_recipe, version_name: "flexi", steps: JSON.stringify([{ descripcion: "Rallar el tofu, sazonarlo y cocinarlo en la air fryer." }, { descripcion: "Rellenar las tortillas con el tofu y freírlas hasta que estén doradas." }]) },
+      { recipe_id: tacosPicadilloRecipe.id_recipe, version_name: "tradicional", steps: [{ descripcion: "Dorar la carne molida de ternera con cebolla y ajo." }, { descripcion: "Añadir tomate y cilantro." }]},
+      { recipe_id: tacosPicadilloRecipe.id_recipe, version_name: "flexi", steps: [{ descripcion: "Dorar la carne de Heura con cebolla y ajo." }, { descripcion: "Añadir tomate y cilantro." }] },
+      { recipe_id: flautasPolloRecipe.id_recipe, version_name: "tradicional", steps: [{ descripcion: "Cocinar la pechuga de pollo y desmenuzarla." }, { descripcion: "Rellenar las tortillas con el pollo y freírlas hasta que estén doradas." }] },
+      { recipe_id: flautasPolloRecipe.id_recipe, version_name: "flexi", steps: [{ descripcion: "Rallar el tofu, sazonarlo y cocinarlo en la air fryer." }, { descripcion: "Rellenar las tortillas con el tofu y freírlas hasta que estén doradas." }] },
+      { 
+        recipe_id: tacosChicharronRecipe.id_recipe, 
+        version_name: "tradicional", 
+        steps: [
+          { descripcion: "Cocinar el chicharrón prensado en una sartén hasta que esté bien dorado." },
+          { descripcion: "Colocar el chicharrón en las tortillas de maíz." },
+          { descripcion: "Acompañar con pico de gallo, salsa y limón al gusto." }
+        ]
+      },
+      { 
+        recipe_id: tacosChicharronRecipe.id_recipe, 
+        version_name: "flexi", 
+        steps: [
+          { descripcion: "Romper el tofu con las manos en pequeños pedazos no uniformes." },
+          { descripcion: "Marinar el tofu con pimentón rojo, comino, ajo, salsa de soja, aceite de oliva y levadura nutricional durante 5 minutos." },
+          { descripcion: "Colocar el tofu marinado en la air fryer durante 10 minutos o hasta que esté crujiente como chicharrón." },
+          { descripcion: "Colocar el chicharrón de tofu en las tortillas de maíz." },
+          { descripcion: "Acompañar con pico de gallo, salsa y limón al gusto." }
+        ]
+      }
+    
     ];
-
+    
     for (const version of versionData) {
       const existingVersion = await RecipeVersion.findOne({
         where: { recipe_id: version.recipe_id, version_name: version.version_name },
       });
-
+    
       if (!existingVersion) {
         await RecipeVersion.create(version);
         console.log(`Versión '${version.version_name}' insertada correctamente.`);
@@ -78,58 +112,29 @@ const insertInitialData = async () => {
         console.log(`Versión '${version.version_name}' ya existe, no se insertó.`);
       }
     }
-
+    
     const insertedVersions = await RecipeVersion.findAll({
       where: {
-        recipe_id: [tacosPicadilloRecipe.id_recipe, flautasPolloRecipe.id_recipe]
+        recipe_id: [tacosPicadilloRecipe.id_recipe, flautasPolloRecipe.id_recipe, tacosChicharronRecipe.id_recipe]
       }
     });
-
+    
+    console.log("Versiones insertadas:", insertedVersions);
+    console.log("Versiones insertadas o encontradas:", insertedVersions.map(v => v.id_version));
+    
     // Insertar ingredientes de versiones con bulkCreate
     const ingredientData = [
-    // Ingredientes de la versión tradicional de tacos
-    { ingredient_name: "Carne molida de ternera", imperial_quantity: "1/4 lb", metric_quantity: "125 g", version_id: insertedVersions.find(v => v.version_name === "tradicional" && v.recipe_id === tacosPicadilloRecipe.id_recipe).id_version },
-    { ingredient_name: "Cebolla", imperial_quantity: "1/4 unit", metric_quantity: "1/4 unidad", version_id: insertedVersions.find(v => v.version_name === "tradicional" && v.recipe_id === tacosPicadilloRecipe.id_recipe).id_version },
-    { ingredient_name: "Ajo", imperial_quantity: "1/2 clove", metric_quantity: "1/2 diente", version_id: insertedVersions.find(v => v.version_name === "tradicional" && v.recipe_id === tacosPicadilloRecipe.id_recipe).id_version },
-    { ingredient_name: "Tortillas de maíz", imperial_quantity: "3 units", metric_quantity: "3 unidades", version_id: insertedVersions.find(v => v.version_name === "tradicional" && v.recipe_id === tacosPicadilloRecipe.id_recipe).id_version },
-    { ingredient_name: "Cilantro", imperial_quantity: "To taste", metric_quantity: "Al gusto", version_id: insertedVersions.find(v => v.version_name === "tradicional" && v.recipe_id === tacosPicadilloRecipe.id_recipe).id_version },
-    { ingredient_name: "Tomate", imperial_quantity: "1/4 unit", metric_quantity: "1/4 unidad", version_id: insertedVersions.find(v => v.version_name === "tradicional" && v.recipe_id === tacosPicadilloRecipe.id_recipe).id_version },
-
-    // Ingredientes de la versión flexi de tacos
-    { ingredient_name: "Carne de Heura", imperial_quantity: "1/4 lb", metric_quantity: "125 g", version_id: insertedVersions.find(v => v.version_name === "flexi" && v.recipe_id === tacosPicadilloRecipe.id_recipe).id_version },
-    { ingredient_name: "Cebolla", imperial_quantity: "1/4 unit", metric_quantity: "1/4 unidad", version_id: insertedVersions.find(v => v.version_name === "flexi" && v.recipe_id === tacosPicadilloRecipe.id_recipe).id_version },
-    { ingredient_name: "Ajo", imperial_quantity: "1/2 clove", metric_quantity: "1/2 diente", version_id: insertedVersions.find(v => v.version_name === "flexi" && v.recipe_id === tacosPicadilloRecipe.id_recipe).id_version },
-    { ingredient_name: "Tortillas de maíz", imperial_quantity: "3 units", metric_quantity: "3 unidades", version_id: insertedVersions.find(v => v.version_name === "flexi" && v.recipe_id === tacosPicadilloRecipe.id_recipe).id_version },
-    { ingredient_name: "Cilantro", imperial_quantity: "To taste", metric_quantity: "Al gusto", version_id: insertedVersions.find(v => v.version_name === "flexi" && v.recipe_id === tacosPicadilloRecipe.id_recipe).id_version },
-    { ingredient_name: "Tomate", imperial_quantity: "1/4 unit", metric_quantity: "1/4 unidad", version_id: insertedVersions.find(v => v.version_name === "flexi" && v.recipe_id === tacosPicadilloRecipe.id_recipe).id_version },
-
-    // Ingredientes de la versión tradicional de flautas
-    { ingredient_name: "Pechuga de pollo", imperial_quantity: "1/4 unit", metric_quantity: "1/4 unidad", version_id: insertedVersions.find(v => v.version_name === "tradicional" && v.recipe_id === flautasPolloRecipe.id_recipe).id_version },
-    { ingredient_name: "Tortillas de maíz", imperial_quantity: "3 units", metric_quantity: "3 unidades", version_id: insertedVersions.find(v => v.version_name === "tradicional" && v.recipe_id === flautasPolloRecipe.id_recipe).id_version },
-    { ingredient_name: "Aceite", imperial_quantity: "To fry", metric_quantity: "Para freír", version_id: insertedVersions.find(v => v.version_name === "tradicional" && v.recipe_id === flautasPolloRecipe.id_recipe).id_version },
-    { ingredient_name: "Salsa verde", imperial_quantity: "To serve", metric_quantity: "Para acompañar", version_id: insertedVersions.find(v => v.version_name === "tradicional" && v.recipe_id === flautasPolloRecipe.id_recipe).id_version },
-    { ingredient_name: "Aguacate", imperial_quantity: "1/4 unit", metric_quantity: "1/4 unidad", version_id: insertedVersions.find(v => v.version_name === "tradicional" && v.recipe_id === flautasPolloRecipe.id_recipe).id_version },
-    { ingredient_name: "Lechuga", imperial_quantity: "1/4 cup", metric_quantity: "1/4 taza", version_id: insertedVersions.find(v => v.version_name === "tradicional" && v.recipe_id === flautasPolloRecipe.id_recipe).id_version },
-    { ingredient_name: "Tomate", imperial_quantity: "1/4 unit", metric_quantity: "1/4 unidad", version_id: insertedVersions.find(v => v.version_name === "tradicional" && v.recipe_id === flautasPolloRecipe.id_recipe).id_version },
-    { ingredient_name: "Limón", imperial_quantity: "1/2 unit", metric_quantity: "1/2 unidad", version_id: insertedVersions.find(v => v.version_name === "tradicional" && v.recipe_id === flautasPolloRecipe.id_recipe).id_version },
-    { ingredient_name: "Queso fresco rallado", imperial_quantity: "1/4 cup", metric_quantity: "1/4 taza", version_id: insertedVersions.find(v => v.version_name === "tradicional" && v.recipe_id === flautasPolloRecipe.id_recipe).id_version },
-    { ingredient_name: "Nata espesa", imperial_quantity: "1/8 cup", metric_quantity: "1/8 taza", version_id: insertedVersions.find(v => v.version_name === "tradicional" && v.recipe_id === flautasPolloRecipe.id_recipe).id_version },
-
-    // Ingredientes de la versión flexi de flautas
-    { ingredient_name: "Tofu", imperial_quantity: "1/4 lb", metric_quantity: "125 g", version_id: insertedVersions.find(v => v.version_name === "flexi" && v.recipe_id === flautasPolloRecipe.id_recipe).id_version },
-    { ingredient_name: "Tortillas de maíz", imperial_quantity: "3 units", metric_quantity: "3 unidades", version_id: insertedVersions.find(v => v.version_name === "flexi" && v.recipe_id === flautasPolloRecipe.id_recipe).id_version },
-    { ingredient_name: "Aceite", imperial_quantity: "To fry", metric_quantity: "Para freír", version_id: insertedVersions.find(v => v.version_name === "flexi" && v.recipe_id === flautasPolloRecipe.id_recipe).id_version },
-    { ingredient_name: "Salsa verde", imperial_quantity: "To serve", metric_quantity: "Para acompañar", version_id: insertedVersions.find(v => v.version_name === "flexi" && v.recipe_id === flautasPolloRecipe.id_recipe).id_version },
-    { ingredient_name: "Aguacate", imperial_quantity: "1/4 unit", metric_quantity: "1/4 unidad", version_id: insertedVersions.find(v => v.version_name === "flexi" && v.recipe_id === flautasPolloRecipe.id_recipe).id_version },
-    { ingredient_name: "Lechuga", imperial_quantity: "1/4 cup", metric_quantity: "1/4 taza", version_id: insertedVersions.find(v => v.version_name === "flexi" && v.recipe_id === flautasPolloRecipe.id_recipe).id_version },
-    { ingredient_name: "Tomate", imperial_quantity: "1/4 unit", metric_quantity: "1/4 unidad", version_id: insertedVersions.find(v => v.version_name === "flexi" && v.recipe_id === flautasPolloRecipe.id_recipe).id_version },
-    { ingredient_name: "Limón", imperial_quantity: "1/2 unit", metric_quantity: "1/2 unidad", version_id: insertedVersions.find(v => v.version_name === "flexi" && v.recipe_id === flautasPolloRecipe.id_recipe).id_version },
-    { ingredient_name: "Queso fresco rallado", imperial_quantity: "1/4 cup", metric_quantity: "1/4 taza", version_id: insertedVersions.find(v => v.version_name === "flexi" && v.recipe_id === flautasPolloRecipe.id_recipe).id_version },
-    { ingredient_name: "Nata espesa", imperial_quantity: "1/8 cup", metric_quantity: "1/8 taza", version_id: insertedVersions.find(v => v.version_name === "flexi" && v.recipe_id === flautasPolloRecipe.id_recipe).id_version },
+      // Ingredientes de la versión tradicional de tacos
+      { ingredient_name: "Carne molida de ternera", imperial_quantity: "1/4 lb", metric_quantity: "125 g", version_id: insertedVersions.find(v => v.version_name === "tradicional" && v.recipe_id === tacosPicadilloRecipe.id_recipe).id_version },
+      // Más ingredientes aquí...
     ];
-
+    console.log("Datos de ingredientes a insertar:", ingredientData);
     await RecipeIngredient.bulkCreate(ingredientData, { ignoreDuplicates: true });
     console.log("Ingredientes insertados correctamente.");
+    
+
+
+    
 
     // Insertar ubicaciones en el mapa
     const mapLocationData = [

@@ -8,8 +8,10 @@ export const getIngredientsByVersion = async (req, res) => {
     const ingredients = await RecipeIngredient.findAll({
       where: { version_id: req.params.versionId }
     });
+    console.log(`Ingredientes encontrados: ${JSON.stringify(ingredients)}`);
     res.json(ingredients);
   } catch (error) {
+    console.error(error);
     res.status(500).json({ error: 'Error al obtener los ingredientes' });
   }
 };
@@ -41,9 +43,12 @@ export const addIngredientToVersion = async (req, res) => {
 // Obtener todos los ingredientes sin importar la versión
 export const getAllIngredients = async (req, res) => {
   try {
+    console.log("Obteniendo todos los ingredientes...");
     const allIngredients = await RecipeIngredient.findAll();
+    console.log(`Total de ingredientes: ${allIngredients.length}`);
     res.json(allIngredients);
   } catch (error) {
+    console.error(error);
     res.status(500).json({ error: "Error al obtener todos los ingredientes" });
   }
 };

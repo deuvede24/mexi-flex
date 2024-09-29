@@ -71,7 +71,7 @@
   </table>
 
   <h3>Versiones</h3>
-  <div *ngFor="let version of recipe?.versions">
+  <div *ngFor="let version of recipe?.RecipeVersions">
     <h4>{{ version.version_name }}</h4>
     <h5>Pasos:</h5>
     <ul>
@@ -81,7 +81,7 @@
     </ul>
     <h5>Ingredientes:</h5>
     <ul>
-      @for (ingredient of version.ingredients; track ingredient) {
+      @for (ingredient of version.RecipeIngredients; track ingredient) {
         <li>{{ ingredient.ingredient_name }} - {{ ingredient.imperial_quantity }} / {{ ingredient.metric_quantity }}</li>
       }
     </ul>
