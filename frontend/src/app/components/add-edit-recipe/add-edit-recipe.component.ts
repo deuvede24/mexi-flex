@@ -372,6 +372,7 @@ export class AddEditRecipeComponent implements OnInit {
   
 
 getRecipeById(id: number) {
+  this.loading = true;
   this.recipeService.getRecipeById(id).subscribe({
     next: (response: { code: number; message: string; data: Recipe }) => {
       const recipeData = response.data;
@@ -393,7 +394,6 @@ getRecipeById(id: number) {
       this.getVersions().clear();
       console.log('Form versions cleared:', this.getVersions().value);
 
-      // Cambiamos aquí para usar 'RecipeVersions' en lugar de 'versions'
       if (recipeData.RecipeVersions && recipeData.RecipeVersions.length > 0) {
         console.log(`Found ${recipeData.RecipeVersions.length} versions for the recipe.`);
 
@@ -406,39 +406,36 @@ getRecipeById(id: number) {
           });
           console.log('Version group after patchValue:', versionGroup.value);
 
-          // Verificar si la versión tiene ingredientes antes de iterar sobre ellos
-          if (version.RecipeIngredients && version.RecipeIngredients.length > 0) {
-            console.log(`Found ${version.RecipeIngredients.length} ingredients for version: ${version.version_name}`);
+          // Procesamos los ingredientes si existen
+          const ingredientsArray = Array.isArray(version.RecipeIngredients) ? version.RecipeIngredients : [];
+          console.log(`Found ${ingredientsArray.length} ingredients for version: ${version.version_name}`);
+          ingredientsArray.forEach((ingredient, ingredientIndex) => {
+            console.log(`Processing ingredient ${ingredientIndex + 1}:`, ingredient);
+            this.getIngredients(this.getVersions().length).push(this.fb.group({
+              ingredient_name: ingredient.ingredient_name,
+              imperial_quantity: ingredient.imperial_quantity,
+              metric_quantity: ingredient.metric_quantity
+            }));
+            console.log('Ingredients FormArray after push:', this.getIngredients(this.getVersions().length).value);
+          });
 
-            version.RecipeIngredients.forEach((ingredient, ingredientIndex) => {
-              console.log(`Processing ingredient ${ingredientIndex + 1}:`, ingredient);
-              this.getIngredients(this.getVersions().length).push({
-                ingredient_name: ingredient.ingredient_name,
-                imperial_quantity: ingredient.imperial_quantity,
-                metric_quantity: ingredient.metric_quantity
-              });
-              console.log('Ingredients FormArray after push:', this.getIngredients(this.getVersions().length).value);
-            });
-          } else {
-            console.log(`No ingredients found for version: ${version.version_name}`);
-          }
-
-          // **Verificación adicional de los pasos antes de procesarlos**
-          console.log(`Raw steps for version ${version.version_name}:`, version.steps);
-          if (version.steps && version.steps.length > 0) {
-            console.log(`Found ${version.steps.length} steps for version: ${version.version_name}`);
-            version.steps.forEach((step, stepIndex) => {
+          // Procesamos los pasos si existen
+          const stepsArray = Array.isArray(version.steps) ? version.steps : [];
+          if (stepsArray.length > 0) {
+            console.log(`Found ${stepsArray.length} steps for version: ${version.version_name}`);
+            stepsArray.forEach((step: any, stepIndex: number) => {
               console.log(`Processing step ${stepIndex + 1}:`, step);
-              this.getSteps(this.getVersions().length).push({
-                description: step.description // Asegúrate de que 'descripcion' es el campo correcto
+              const stepGroup = this.fb.group({
+                description: step.description // Asegúrate de que 'description' es el campo correcto
               });
+              this.getSteps(this.getVersions().length).push(stepGroup);
               console.log('Steps FormArray after push:', this.getSteps(this.getVersions().length).value);
             });
           } else {
             console.log(`No steps found for version: ${version.version_name}`);
           }
 
-          // Finalmente, agregar el grupo de versión al formulario
+          // Finalmente, agregamos la versión procesada al formulario
           console.log(`Adding version ${version.version_name} to the form.`);
           this.getVersions().push(versionGroup);
           console.log('Form versions after push:', this.getVersions().value);
@@ -446,13 +443,16 @@ getRecipeById(id: number) {
       } else {
         console.log('No versions found for recipe.');
       }
+
+      this.loading = false;
     },
     error: (error) => {
       console.error('Error retrieving recipe:', error);
+      this.notificationService.showError('Error al cargar la receta.');
+      this.loading = false;
     },
   });
 }
-
 
 
 

@@ -20,51 +20,32 @@ export const recipeValidator = [
     .isBoolean()
     .withMessage('Is premium should be a boolean'),
 
-  // Validación para las versiones
-  body('versions')
+  body('steps')
     .isArray({ min: 1 })
-    .withMessage('At least one version is required'),
-
-  // Validación para cada versión dentro de versiones
-  body('versions.*.version_name')
-    .notEmpty()
-    .withMessage('Version name is required')
-    .isString()
-    .withMessage('Version name should be a string'),
-  
-  body('versions.*.steps')
-    .isArray({ min: 1 })
-    .withMessage('Steps are required for each version')
+    .withMessage('At least one step is required')
     .custom((steps) => {
-      // Validamos que cada paso sea un objeto con una propiedad 'descripcion' no vacía
-      if (!steps.every(step => typeof step === 'object' && 'descripcion' in step && typeof step.descripcion === 'string' && step.descripcion.length > 0)) {
-        throw new Error('Each step should be a non-empty object with a "descripcion" field');
+      if (!steps.every(step => typeof step === 'object' && 'description' in step && typeof step.description === 'string' && step.description.length > 0)) {
+        throw new Error('Each step should be a non-empty object with a "description" field');
       }
       return true;
     }),
 
-  // Validación para los ingredientes de cada versión
-  body('versions.*.ingredients')
+  // Validación para los ingredientes
+  body('ingredients')
     .isArray({ min: 1 })
-    .withMessage('Ingredients are required for each version'),
+    .withMessage('At least one ingredient is required'),
 
-  body('versions.*.ingredients.*.ingredient_name')
+  body('ingredients.*.ingredient_name')
     .notEmpty()
     .withMessage('Ingredient name is required')
     .isString()
     .withMessage('Ingredient name should be a string'),
 
-  body('versions.*.ingredients.*.imperial_quantity')
+  body('ingredients.*.quantity')
     .notEmpty()
-    .withMessage('Imperial quantity is required')
+    .withMessage('Quantity is required')
     .isString()
-    .withMessage('Imperial quantity should be a string'),
-
-  body('versions.*.ingredients.*.metric_quantity')
-    .notEmpty()
-    .withMessage('Metric quantity is required')
-    .isString()
-    .withMessage('Metric quantity should be a string'),
+    .withMessage('Quantity should be a string'),
 ];
 
 // Validador para actualizaciones parciales de receta (PATCH)
@@ -88,54 +69,35 @@ export const recipeValidatorPatch = [
     .isBoolean()
     .withMessage('Is premium should be a boolean'),
 
-  body('versions')
+  body('steps')
     .optional()
     .isArray({ min: 1 })
-    .withMessage('At least one version is required if provided'),
-
-  body('versions.*.version_name')
-    .optional()
-    .notEmpty()
-    .withMessage('Version name is required if provided')
-    .isString()
-    .withMessage('Version name should be a string'),
-  
-  body('versions.*.steps')
-    .optional()
-    .isArray({ min: 1 })
-    .withMessage('Steps are required for each version if provided')
+    .withMessage('Steps are required if provided')
     .custom((steps) => {
-      if (!steps.every(step => typeof step === 'object' && 'descripcion' in step && typeof step.descripcion === 'string' && step.descripcion.length > 0)) {
-        throw new Error('Each step should be a non-empty object with a "descripcion" field');
+      if (!steps.every(step => typeof step === 'object' && 'description' in step && typeof step.description === 'string' && step.description.length > 0)) {
+        throw new Error('Each step should be a non-empty object with a "description" field');
       }
       return true;
     }),
 
-  body('versions.*.ingredients')
+  body('ingredients')
     .optional()
     .isArray({ min: 1 })
-    .withMessage('Ingredients are required for each version if provided'),
+    .withMessage('Ingredients are required if provided'),
 
-  body('versions.*.ingredients.*.ingredient_name')
+  body('ingredients.*.ingredient_name')
     .optional()
     .notEmpty()
     .withMessage('Ingredient name is required if provided')
     .isString()
     .withMessage('Ingredient name should be a string'),
 
-  body('versions.*.ingredients.*.imperial_quantity')
+  body('ingredients.*.quantity')
     .optional()
     .notEmpty()
-    .withMessage('Imperial quantity is required if provided')
+    .withMessage('Quantity is required if provided')
     .isString()
-    .withMessage('Imperial quantity should be a string'),
-
-  body('versions.*.ingredients.*.metric_quantity')
-    .optional()
-    .notEmpty()
-    .withMessage('Metric quantity is required if provided')
-    .isString()
-    .withMessage('Metric quantity should be a string'),
+    .withMessage('Quantity should be a string'),
 ];
 
 // Validador para ID (cuando se requiere un ID en la URL)

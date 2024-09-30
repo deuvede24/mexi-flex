@@ -1,47 +1,36 @@
 // src/models/recipeIngredientModel.js
 import { DataTypes } from 'sequelize';
 import { sequelize } from '../db.js';
-import RecipeVersion from './recipeVersionModel.js'; // Referencia a la versión de receta
+import Recipe from './recipeModel.js';  // Referencia a la receta directamente
 
 const RecipeIngredient = sequelize.define('RecipeIngredient', {
   id_recipe_ingredients: {
-    type: DataTypes.INTEGER(11).UNSIGNED,  // Usamos UNSIGNED para los IDs de ingredientes
+    type: DataTypes.INTEGER(11),
     primaryKey: true,
-    autoIncrement: true
+    autoIncrement: true,
   },
-  version_id: {
-    type: DataTypes.INTEGER(11).UNSIGNED,  // Referencia a la versión de la receta
+  recipe_id: {
+    type: DataTypes.INTEGER(11),
     allowNull: false,
     references: {
-      model: RecipeVersion,
-      key: 'id_version'
+      model: Recipe,
+      key: 'id_recipe'
     }
   },
   ingredient_name: {
     type: DataTypes.STRING(100),
-    allowNull: false
+    allowNull: false,
   },
-  imperial_quantity: {
+  quantity: {
     type: DataTypes.STRING(50),
-    allowNull: false
+    allowNull: false,  // Solo un sistema de medidas
   },
-  metric_quantity: {
-    type: DataTypes.STRING(50),
-    allowNull: false
-  }
 }, {
   tableName: 'recipe_ingredients',
-  timestamps: false,  // No es necesario guardar timestamps para los ingredientes
-  indexes: [
-    {
-      unique: true,  // Restricción de unicidad entre `ingredient_name` y `version_id`
-      fields: ['ingredient_name', 'version_id']
-    }
-  ]
+  timestamps: false,
 });
 
-RecipeVersion.hasMany(RecipeIngredient, { foreignKey: 'version_id' });
-RecipeIngredient.belongsTo(RecipeVersion, { foreignKey: 'version_id' });
+Recipe.hasMany(RecipeIngredient, { foreignKey: 'recipe_id' });
+RecipeIngredient.belongsTo(Recipe, { foreignKey: 'recipe_id' });
 
 export default RecipeIngredient;
-
