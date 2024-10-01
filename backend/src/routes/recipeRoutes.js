@@ -1,26 +1,3 @@
-/*import { Router } from 'express';
-import { getRecipes, getRecipeById, addRecipe, updateRecipe, deleteRecipe } from '../controllers/recipeController.js';
-import { authenticateToken } from '../middlewares/authenticateToken.js';
-import { recipeValidator } from '../validations/recipeValidation.js';
-import { idValidator } from '../validations/genericValidation.js';
-
-const router = Router();
-
-router.get('/:id', getRecipeById);
-router.post('/', authenticateToken(['user', 'admin']), recipeValidator, addRecipe);
-
-// Aquí añadimos ambas rutas para actualizar recetas: PUT y PATCH
-router.put('/:id', authenticateToken(['user', 'admin']), idValidator, recipeValidator, updateRecipe);
-router.patch('/:id', authenticateToken(['user', 'admin']), idValidator, recipeValidator, updateRecipe);
-
-router.delete('/:id', authenticateToken(['user','admin']), idValidator, deleteRecipe);
-
-// Ruta accesible para todos para obtener las recetas
-router.get('/', getRecipes); 
-
-export default router;*/
-
-//NEW
 // src/routes/recipeRoutes.js
 import { Router } from 'express';
 import {
@@ -29,24 +6,24 @@ import {
   addRecipe,
   updateRecipe,
   deleteRecipe,
-  getRecipeCategoryCount
 } from '../controllers/recipeController.js';
 import { authenticateToken } from '../middlewares/authenticateToken.js';
-import { recipeValidator } from '../validations/recipeValidation.js';
+import { recipeValidator, recipeValidatorPatch } from '../validations/recipeValidation.js';
 import { idValidator } from '../validations/genericValidation.js';
 
 const router = Router();
 
-router.get('/category-count', getRecipeCategoryCount);
-
-// Obtener receta por ID con versiones e ingredientes
+// Obtener receta por ID con ingredientes
 router.get('/:id', getRecipeById);
 
-// Crear receta con versiones e ingredientes (solo admin)
+// Crear receta con ingredientes (solo admin)
 router.post('/', authenticateToken(['admin']), recipeValidator, addRecipe);
 
-// Actualizar receta (solo admin)
+// Actualizar receta (solo admin) - Si decides usar solo PUT, elimina PATCH
 router.put('/:id', authenticateToken(['admin']), idValidator, recipeValidator, updateRecipe);
+
+// O bien, si necesitas PATCH para actualizaciones parciales:
+router.patch('/:id', authenticateToken(['admin']), idValidator, recipeValidatorPatch, updateRecipe);
 
 // Eliminar receta (solo admin)
 router.delete('/:id', authenticateToken(['admin']), idValidator, deleteRecipe);
@@ -55,6 +32,7 @@ router.delete('/:id', authenticateToken(['admin']), idValidator, deleteRecipe);
 router.get('/', getRecipes);
 
 export default router;
+
 
 
 

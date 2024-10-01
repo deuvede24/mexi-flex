@@ -46,6 +46,35 @@ export const recipeValidator = [
     .withMessage('Quantity is required')
     .isString()
     .withMessage('Quantity should be a string'),
+
+  // Validación para serving_size (opcional, por defecto será 1)
+  body('serving_size')
+    .optional()
+    .isInt({ min: 1 })
+    .withMessage('Serving size must be a positive integer'),
+
+  // Validación para preparation_time (opcional)
+  body('preparation_time')
+    .optional()
+    .isInt({ min: 1 })
+    .withMessage('Preparation time must be a positive integer representing minutes'),
+
+  // Validación para image (opcional)
+  body('image')
+    .optional()
+    .isString()
+    .withMessage('Image should be a string')
+    .matches(/\.(jpg|jpeg|png)$/)
+    .withMessage('Image must have a valid file extension (jpg, jpeg, png)'),
+
+  // Validación para category
+  body('category')
+    .notEmpty()
+    .withMessage('Category is required')
+    .isString()
+    .withMessage('Category should be a string')
+    .isIn(['tradicional', 'flexi'])
+    .withMessage('Category must be either tradicional or flexi')
 ];
 
 // Validador para actualizaciones parciales de receta (PATCH)
@@ -98,6 +127,36 @@ export const recipeValidatorPatch = [
     .withMessage('Quantity is required if provided')
     .isString()
     .withMessage('Quantity should be a string'),
+
+  // Validación para serving_size (opcional en PATCH)
+  body('serving_size')
+    .optional()
+    .isInt({ min: 1 })
+    .withMessage('Serving size must be a positive integer'),
+
+  // Validación para preparation_time (opcional en PATCH)
+  body('preparation_time')
+    .optional()
+    .isInt({ min: 1 })
+    .withMessage('Preparation time must be a positive integer representing minutes'),
+
+  // Validación para image (opcional en PATCH)
+  body('image')
+    .optional()
+    .isString()
+    .withMessage('Image should be a string')
+    .matches(/\.(jpg|jpeg|png)$/)
+    .withMessage('Image must have a valid file extension (jpg, jpeg, png)'),
+
+  // Validación para category (opcional en PATCH)
+  body('category')
+    .optional()
+    .notEmpty()
+    .withMessage('Category is required if provided')
+    .isString()
+    .withMessage('Category should be a string')
+    .isIn(['tradicional', 'flexi'])
+    .withMessage('Category must be either tradicional or flexi')
 ];
 
 // Validador para ID (cuando se requiere un ID en la URL)
