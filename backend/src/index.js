@@ -6,15 +6,13 @@ import authRoutes from "./routes/authRoutes.js";
 import userRoutes from "./routes/userRoutes.js";
 import recipeRoutes from "./routes/recipeRoutes.js"; // Importar correctamente
 import testRoutes from "./routes/testRoutes.js"; // Si esto es necesario
-//import commentRoutes from "./routes/commentRoutes.js";
-//import favoriteRoutes from "./routes/favoriteRoutes.js";
-import mapLocationRoutes from './routes/mapRoutes.js'
-import mapRoutes from './routes/mapRoutes.js';
-import eventRoutes from './routes/eventRoutes.js';
-import chartRoutes from './routes/chartRoutes.js';
-
-import recipeIngredientRoutes from './routes/recipeIngredientRoutes.js';
-
+import mapLocationRoutes from "./routes/mapRoutes.js";
+import mapRoutes from "./routes/mapRoutes.js";
+import eventRoutes from "./routes/eventRoutes.js";
+//import chartRoutes from "./routes/chartRoutes.js";
+import recipeIngredientRoutes from "./routes/recipeIngredientRoutes.js";
+import rankingRoutes from "./routes/rankingRoutes.js"; // Nuevas rutas
+import favoriteRoutes from "./routes/favoriteRoutes.js"; // Nuevas rutas
 
 import { testConnection } from "./db.js";
 import insertInitialData from "./start_data.js";
@@ -41,16 +39,17 @@ await insertInitialData();
 // Configurar rutas
 app.use("/auth", authRoutes);
 app.use("/users", userRoutes);
-app.use('/recipes', recipeRoutes); // Asegúrate de que esta línea esté correcta
+app.use("/recipes", recipeRoutes);
 app.use("/test", testRoutes); // Si esto es necesario
-//app.use("/comments", commentRoutes);
-//app.use("/favorites", favoriteRoutes);
-app.use('/locations', mapLocationRoutes);
-app.use('/map', mapRoutes);
-app.use('/events', eventRoutes);  // Añadir las rutas de eventos
-app.use('/api/charts', chartRoutes); 
+app.use("/locations", mapLocationRoutes);
+app.use("/map", mapRoutes);
+app.use("/events", eventRoutes);
+//app.use("/api/charts", chartRoutes);
+app.use("/recipe-ingredients", recipeIngredientRoutes);
 
-app.use('/recipe-ingredients', recipeIngredientRoutes);
+// Nuevas rutas para rankings y favoritos
+app.use("/rankings", rankingRoutes); // Rutas para rankings
+app.use("/favorites", favoriteRoutes); // Rutas para favoritos
 
 // Iniciar el servidor
 const PORT = 3000;

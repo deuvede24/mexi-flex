@@ -58,7 +58,7 @@ const Event = sequelize.define('Event', {
     allowNull: true,
   },
   type: {
-    type: DataTypes.ENUM('receta', 'restaurante'),
+    type: DataTypes.ENUM('receta', 'restaurante', 'feria'),
     allowNull: false,
   },
   date: {

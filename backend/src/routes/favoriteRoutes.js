@@ -12,3 +12,4 @@ router.delete('/:id', authenticateToken(['admin']), deleteFavorite);
 
 export default router;
 
+

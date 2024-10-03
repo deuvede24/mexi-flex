@@ -1,55 +1,63 @@
 import Favorite from '../models/favoriteModel.js';
-import { validationResult } from 'express-validator';
 
+// Obtener todos los favoritos de un usuario
 export const getFavorites = async (req, res) => {
   try {
-    const favorites = await Favorite.findAll();
-    res.status(200).json({ favorites });
+    const { user_id } = req.user;  // Se asume que el ID de usuario viene del token
+    const favorites = await Favorite.findAll({ where: { user_id } });
+    return res.status(200).json(favorites);
   } catch (error) {
-    res.status(500).json({ error: error.message });
+    console.error("Error fetching favorites:", error);
+    return res.status(500).json({ message: 'Error fetching favorites.' });
   }
 };
 
+// Obtener un favorito por ID
 export const getFavoriteById = async (req, res) => {
   try {
     const { id } = req.params;
     const favorite = await Favorite.findByPk(id);
-    if (favorite) {
-      res.status(200).json({ favorite });
-    } else {
-      res.status(404).json({ error: 'Favorite not found' });
+    if (!favorite) {
+      return res.status(404).json({ message: 'Favorite not found.' });
     }
+    return res.status(200).json(favorite);
   } catch (error) {
-    res.status(500).json({ error: error.message });
+    console.error("Error fetching favorite by ID:", error);
+    return res.status(500).json({ message: 'Error fetching favorite by ID.' });
   }
 };
 
+// Añadir una receta a favoritos
 export const addFavorite = async (req, res) => {
-  const errors = validationResult(req);
-  if (!errors.isEmpty()) {
-    return res.status(400).json({ errors: errors.array() });
-  }
-  
   try {
     const { user_id, recipe_id } = req.body;
-    const newFavorite = await Favorite.create({ user_id, recipe_id });
-    res.status(201).json({ newFavorite });
+    const existingFavorite = await Favorite.findOne({ where: { user_id, recipe_id } });
+
+    if (existingFavorite) {
+      return res.status(400).json({ message: 'Recipe is already in favorites.' });
+    }
+
+    const favorite = await Favorite.create({ user_id, recipe_id });
+    return res.status(201).json(favorite);
   } catch (error) {
-    res.status(500).json({ error: error.message });
+    console.error("Error adding favorite:", error);
+    return res.status(500).json({ message: 'Error adding favorite.' });
   }
 };
 
+// Eliminar un favorito
 export const deleteFavorite = async (req, res) => {
   try {
     const { id } = req.params;
-    const deleted = await Favorite.destroy({ where: { id_favorite: id } });
-    if (deleted) {
-      res.status(204).send();
-    } else {
-      res.status(404).json({ error: 'Favorite not found' });
+    const favorite = await Favorite.destroy({ where: { id } });
+
+    if (!favorite) {
+      return res.status(404).json({ message: 'Favorite not found.' });
     }
+
+    return res.status(200).json({ message: 'Favorite removed successfully.' });
   } catch (error) {
-    res.status(500).json({ error: error.message });
+    console.error("Error deleting favorite:", error);
+    return res.status(500).json({ message: 'Error deleting favorite.' });
   }
 };
-

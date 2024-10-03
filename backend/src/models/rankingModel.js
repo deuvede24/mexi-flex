@@ -3,7 +3,7 @@ import { sequelize } from '../db.js';
 import User from './userModel.js';
 import Recipe from './recipeModel.js';
 
-const Favorite = sequelize.define('Favorite', {
+const Ranking = sequelize.define('Ranking', {
   id: {
     type: DataTypes.INTEGER,
     autoIncrement: true,
@@ -27,18 +27,24 @@ const Favorite = sequelize.define('Favorite', {
     },
     onDelete: 'CASCADE',
   },
+  rating: {
+    type: DataTypes.TINYINT,
+    allowNull: false,
+    validate: {
+      min: 1,
+      max: 5,
+    },
+  },
 }, {
-  tableName: 'favorites',
-  timestamps: true, // Incluye createdAt y updatedAt
+  tableName: 'rankings',
+  timestamps: true,
 });
 
 // Relaciones
-User.hasMany(Favorite, { foreignKey: 'user_id' });
-Favorite.belongsTo(User, { foreignKey: 'user_id' });
+User.hasMany(Ranking, { foreignKey: 'user_id' });
+Ranking.belongsTo(User, { foreignKey: 'user_id' });
 
-Recipe.hasMany(Favorite, { foreignKey: 'recipe_id' });
-Favorite.belongsTo(Recipe, { foreignKey: 'recipe_id' });
+Recipe.hasMany(Ranking, { foreignKey: 'recipe_id' });
+Ranking.belongsTo(Recipe, { foreignKey: 'recipe_id' });
 
-export default Favorite;
-
-
+export default Ranking;
