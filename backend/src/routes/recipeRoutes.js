@@ -1,38 +1,72 @@
 // src/routes/recipeRoutes.js
-import { Router } from 'express';
+import { Router } from "express";
 import {
   getRecipes,
   getRecipeById,
   addRecipe,
   updateRecipe,
+  patchRecipe,
   deleteRecipe,
-} from '../controllers/recipeController.js';
-import { authenticateToken } from '../middlewares/authenticateToken.js';
-import { recipeValidator, recipeValidatorPatch } from '../validations/recipeValidation.js';
-import { idValidator } from '../validations/genericValidation.js';
+} from "../controllers/recipeController.js";
+import {
+  addIngredientToRecipe, // Añadir ingrediente
+  updateIngredientInRecipe, // Actualizar ingrediente
+  deleteIngredientFromRecipe, // Eliminar ingrediente
+  getIngredientsByRecipeId,
+  getAllIngredients
+} from "../controllers/recipeIngredientController.js";
+import { authenticateToken } from "../middlewares/authenticateToken.js";
+import {
+  recipeValidator,
+  recipeValidatorPatch,
+} from "../validations/recipeValidation.js";
+import { idValidator } from "../validations/genericValidation.js";
+import { recipeIngredientValidator } from "../validations/recipeIngredientValidator.js";
 
 const router = Router();
 
-// Obtener receta por ID con ingredientes
-router.get('/:id', getRecipeById);
+// Rutas de recetas
+router.get("/", getRecipes);
+router.get("/:id", idValidator, getRecipeById);
+router.post("/", authenticateToken(["admin"]), recipeValidator, addRecipe);
+router.put(
+  "/:id",
+  authenticateToken(["admin"]),
+  idValidator,
+  recipeValidator,
+  updateRecipe
+);
+router.patch(
+  "/:id",
+  authenticateToken(["admin"]),
+  idValidator,
+  recipeValidatorPatch,
+  patchRecipe
+);
+router.delete("/:id", authenticateToken(["admin"]), idValidator, deleteRecipe);
 
-// Crear receta con ingredientes (solo admin)
-router.post('/', authenticateToken(['admin']), recipeValidator, addRecipe);
-
-// Actualizar receta (solo admin) - Si decides usar solo PUT, elimina PATCH
-router.put('/:id', authenticateToken(['admin']), idValidator, recipeValidator, updateRecipe);
-
-// O bien, si necesitas PATCH para actualizaciones parciales:
-router.patch('/:id', authenticateToken(['admin']), idValidator, recipeValidatorPatch, updateRecipe);
-
-// Eliminar receta (solo admin)
-router.delete('/:id', authenticateToken(['admin']), idValidator, deleteRecipe);
-
-// Obtener todas las recetas (controla los invitados)
-router.get('/', getRecipes);
+// **Rutas para manejar ingredientes dentro de una receta**
+router.post(
+  "/:recipeId/ingredient",
+  authenticateToken(["admin"]),
+  recipeIngredientValidator,
+  addIngredientToRecipe
+);
+router.put(
+  "/:recipeId/ingredient/:ingredientId",
+  authenticateToken(["admin"]),
+  idValidator,
+  recipeIngredientValidator,
+  updateIngredientInRecipe
+);
+router.delete(
+  "/:recipeId/ingredient/:ingredientId",
+  authenticateToken(["admin"]),
+  idValidator,
+  deleteIngredientFromRecipe
+);
+router.get("/:recipeId/ingredients", idValidator, getIngredientsByRecipeId); // Obtener todos los ingredientes de una receta específica
+// **Rutas globales de ingredientes**
+router.get("/ingredients", getAllIngredients); // Obtener todos los ingredientes globales (accesible para todos)
 
 export default router;
-
-
-
-

@@ -10,7 +10,7 @@ import mapLocationRoutes from "./routes/mapRoutes.js";
 import mapRoutes from "./routes/mapRoutes.js";
 import eventRoutes from "./routes/eventRoutes.js";
 //import chartRoutes from "./routes/chartRoutes.js";
-import recipeIngredientRoutes from "./routes/recipeIngredientRoutes.js";
+//import recipeIngredientRoutes from "./routes/recipeIngredientRoutes.js";
 import rankingRoutes from "./routes/rankingRoutes.js"; // Nuevas rutas
 import favoriteRoutes from "./routes/favoriteRoutes.js"; // Nuevas rutas
 
@@ -45,7 +45,7 @@ app.use("/locations", mapLocationRoutes);
 app.use("/map", mapRoutes);
 app.use("/events", eventRoutes);
 //app.use("/api/charts", chartRoutes);
-app.use("/recipe-ingredients", recipeIngredientRoutes);
+//app.use("/recipe-ingredients", recipeIngredientRoutes);
 
 // Nuevas rutas para rankings y favoritos
 app.use("/rankings", rankingRoutes); // Rutas para rankings

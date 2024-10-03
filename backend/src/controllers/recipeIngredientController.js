@@ -1,183 +1,102 @@
-// src/controllers/recipeIngredientController.js
-/*import RecipeIngredient from '../models/recipeIngredientModel.js';
-import { validationResult } from 'express-validator';
+// RecipeIngredientController.js
 
-// Obtener todos los ingredientes de una versión específica de receta
-export const getIngredientsByVersion = async (req, res) => {
-  try {
-    const ingredients = await RecipeIngredient.findAll({
-      where: { version_id: req.params.versionId }
-    });
-    console.log(`Ingredientes encontrados: ${JSON.stringify(ingredients)}`);
-    res.json(ingredients);
-  } catch (error) {
-    console.error(error);
-    res.status(500).json({ error: 'Error al obtener los ingredientes' });
-  }
-};
+import RecipeIngredient from "../models/recipeIngredientModel.js";
 
-// Añadir un ingrediente a una versión de receta
-export const addIngredientToVersion = async (req, res) => {
-  const { ingredient_name, imperial_quantity, metric_quantity } = req.body;
-  const userRole = req.user.roles; // Verificar el rol
-
-  if (userRole === 'guest') {
-    return res.status(403).json({ error: 'Los invitados no pueden añadir ingredientes' });
-  }
-
-  try {
-    const newIngredient = await RecipeIngredient.create({
-      version_id: req.params.versionId,
-      ingredient_name,
-      imperial_quantity,
-      metric_quantity
-    });
-    res.json(newIngredient);
-  } catch (error) {
-    res.status(500).json({ error: 'Error al añadir el ingrediente' });
-  }
-};
-
-// src/controllers/recipeIngredientController.js
-
-// Obtener todos los ingredientes sin importar la versión
 export const getAllIngredients = async (req, res) => {
-  try {
-    console.log("Obteniendo todos los ingredientes...");
-    const allIngredients = await RecipeIngredient.findAll();
-    console.log(`Total de ingredientes: ${allIngredients.length}`);
-    res.json(allIngredients);
-  } catch (error) {
-    console.error(error);
-    res.status(500).json({ error: "Error al obtener todos los ingredientes" });
-  }
-};
+    try {
+      const ingredients = await RecipeIngredient.findAll(); // Ejemplo de consulta a la base de datos
+      res.json(ingredients);
+    } catch (error) {
+      res.status(500).json({ message: "Error al obtener los ingredientes." });
+    }
+  };
 
-
-// Actualizar un ingrediente de una versión de receta
-export const updateIngredient = async (req, res) => {
-  const { ingredient_name, imperial_quantity, metric_quantity } = req.body;
-  const userRole = req.user.roles;
-
-  if (userRole === 'guest') {
-    return res.status(403).json({ error: 'Los invitados no pueden actualizar ingredientes' });
-  }
-
-  try {
-    const updatedIngredient = await RecipeIngredient.update(
-      { ingredient_name, imperial_quantity, metric_quantity },
-      { where: { id_recipe_ingredients: req.params.ingredientId } }
-    );
-    res.json(updatedIngredient);
-  } catch (error) {
-    res.status(500).json({ error: 'Error al actualizar el ingrediente' });
-  }
-};
-
-// Eliminar un ingrediente de una versión de receta
-export const deleteIngredient = async (req, res) => {
-  const userRole = req.user.roles;
-
-  if (userRole === 'guest') {
-    return res.status(403).json({ error: 'Los invitados no pueden eliminar ingredientes' });
-  }
-
-  try {
-    await RecipeIngredient.destroy({
-      where: { id_recipe_ingredients: req.params.ingredientId }
-    });
-    res.json({ message: 'Ingrediente eliminado con éxito' });
-  } catch (error) {
-    res.status(500).json({ error: 'Error al eliminar el ingrediente' });
-  }
-};*/
-
-
-import RecipeIngredient from '../models/recipeIngredientModel.js';
-import { validationResult } from 'express-validator';
-
+  
 // Obtener todos los ingredientes de una receta específica
 export const getIngredientsByRecipeId = async (req, res) => {
+  const { recipeId } = req.params;
+
   try {
+    // Consulta a la base de datos para obtener los ingredientes de la receta
     const ingredients = await RecipeIngredient.findAll({
-      where: { recipe_id: req.params.recipeId }
+      where: {
+        recipe_id: recipeId
+      }
     });
-    console.log(`Ingredientes encontrados: ${JSON.stringify(ingredients)}`);
+
+    // Verificar si se encontraron ingredientes
+    if (!ingredients.length) {
+      return res.status(404).json({ message: 'No se encontraron ingredientes para esta receta.' });
+    }
+
+    // Enviar los ingredientes en la respuesta
     res.json(ingredients);
   } catch (error) {
+    // Manejo de errores
     console.error(error);
-    res.status(500).json({ error: 'Error al obtener los ingredientes' });
+    res.status(500).json({ message: 'Error al obtener los ingredientes.' });
   }
 };
 
-// Añadir un ingrediente a una receta (solo admin)
-export const addIngredient = async (req, res) => {
-  const { ingredient_name, quantity } = req.body;
-  const userRole = req.user.roles; // Verificar el rol
+  
 
-  if (userRole === 'guest' || userRole === 'user') {
-    return res.status(403).json({ error: 'Solo los administradores pueden añadir ingredientes' });
-  }
+// Añadir ingrediente a una receta específica
+export const addIngredientToRecipe = async (req, res) => {
+  const { ingredient_name, quantity } = req.body;
+  const { recipeId } = req.params;
 
   try {
     const newIngredient = await RecipeIngredient.create({
-      recipe_id: req.params.recipeId,
+      recipe_id: recipeId,
       ingredient_name,
-      quantity
+      quantity,
     });
-    res.json(newIngredient);
-  } catch (error) {
-    res.status(500).json({ error: 'Error al añadir el ingrediente' });
-  }
-};
 
-// Obtener todos los ingredientes sin importar la receta
-export const getAllIngredients = async (req, res) => {
-  try {
-    console.log("Obteniendo todos los ingredientes...");
-    const allIngredients = await RecipeIngredient.findAll();
-    console.log(`Total de ingredientes: ${allIngredients.length}`);
-    res.json(allIngredients);
+    res.status(200).json({ message: 'Ingrediente añadido con éxito', newIngredient });
   } catch (error) {
     console.error(error);
-    res.status(500).json({ error: "Error al obtener todos los ingredientes" });
+    res.status(500).json({ error: 'Error al añadir el ingrediente a la receta' });
   }
 };
 
-// Actualizar un ingrediente de una receta (solo admin)
-export const updateIngredient = async (req, res) => {
+// Actualizar ingrediente dentro de una receta
+export const updateIngredientInRecipe = async (req, res) => {
+  const { ingredientId } = req.params;
   const { ingredient_name, quantity } = req.body;
-  const userRole = req.user.roles;
-
-  if (userRole === 'guest' || userRole === 'user') {
-    return res.status(403).json({ error: 'Solo los administradores pueden actualizar ingredientes' });
-  }
 
   try {
-    const updatedIngredient = await RecipeIngredient.update(
-      { ingredient_name, quantity },
-      { where: { id_recipe_ingredients: req.params.ingredientId } }
-    );
-    res.json(updatedIngredient);
+    const ingredient = await RecipeIngredient.findByPk(ingredientId);
+
+    if (!ingredient) {
+      return res.status(404).json({ error: 'Ingrediente no encontrado' });
+    }
+
+    await ingredient.update({ ingredient_name, quantity });
+
+    res.status(200).json({ message: 'Ingrediente actualizado con éxito', ingredient });
   } catch (error) {
-    res.status(500).json({ error: 'Error al actualizar el ingrediente' });
+    console.error(error);
+    res.status(500).json({ error: 'Error al actualizar el ingrediente de la receta' });
   }
 };
 
-// Eliminar un ingrediente de una receta (solo admin)
-export const deleteIngredient = async (req, res) => {
-  const userRole = req.user.roles;
-
-  if (userRole === 'guest' || userRole === 'user') {
-    return res.status(403).json({ error: 'Solo los administradores pueden eliminar ingredientes' });
-  }
+// Eliminar ingrediente específico de una receta
+export const deleteIngredientFromRecipe = async (req, res) => {
+  const { recipeId, ingredientId } = req.params;
 
   try {
-    await RecipeIngredient.destroy({
-      where: { id_recipe_ingredients: req.params.ingredientId }
+    const ingredient = await RecipeIngredient.findOne({
+      where: { id_recipe_ingredients: ingredientId, recipe_id: recipeId }
     });
-    res.json({ message: 'Ingrediente eliminado con éxito' });
+
+    if (!ingredient) {
+      return res.status(404).json({ error: 'Ingrediente no encontrado' });
+    }
+
+    await ingredient.destroy();
+    res.status(200).json({ message: 'Ingrediente eliminado con éxito' });
   } catch (error) {
+    console.error(error);
     res.status(500).json({ error: 'Error al eliminar el ingrediente' });
   }
 };
