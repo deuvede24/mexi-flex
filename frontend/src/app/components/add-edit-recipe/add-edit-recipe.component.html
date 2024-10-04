@@ -1,11 +1,7 @@
 <!--<div class="container mt-4">
   <div class="card border-primary mb-3">
     <div class="card-header">
-      @if (id === 0) {
-      Agregar Receta
-      } @else {
-      Editar Receta
-      }
+      {{ id !== 0 ? 'Editar Receta' : 'Añadir Nueva Receta' }}
     </div>
     <div class="card-body text-primary">
       <form [formGroup]="form" (ngSubmit)="saveRecipe()">
@@ -14,238 +10,67 @@
         <div class="form-group">
           <label for="title">Título</label>
           <input formControlName="title" type="text" id="title" class="form-control" placeholder="Ingrese título">
-          @if (form.get('title')?.hasError('required') && form.get('title')?.touched) {
-          <span class="text-danger">
-            El campo título es <strong>requerido</strong>
-          </span>
-          }
         </div>
 
-     
+       
         <div class="form-group mt-3">
           <label for="description">Descripción</label>
-          <input formControlName="description" type="text" id="description" class="form-control"
-            placeholder="Ingrese descripción">
-          @if (form.get('description')?.hasError('required') && form.get('description')?.touched) {
-          <span class="text-danger">
-            El campo descripción es <strong>requerido</strong>
-          </span>
-          }
+          <textarea formControlName="description" id="description" class="form-control" placeholder="Ingrese descripción"></textarea>
         </div>
-        <div class="form-group mt-3">
-          <label for="ingredients">Ingredientes</label>
-          <div formArrayName="ingredients">
-            @for (ingredient of getIngredients().controls; track $index) {
-            <div [formGroupName]="$index" class="d-flex mb-2">
-           
-              <input formControlName="nombre" class="form-control mr-2" placeholder="Ingrediente" />
 
-            
-              <input formControlName="cantidadImperial" class="form-control mr-2"
-                placeholder="Cantidad Imperial (ej: 1 taza)" />
-
-            
-              <input formControlName="cantidadMetric" class="form-control mr-2"
-                placeholder="Cantidad Métrico (ej: 200 gramos)" />
-
-              <button type="button" class="btn btn-danger" (click)="removeIngredient($index)">Eliminar</button>
-            </div>
-            }
+        <div formArrayName="ingredients" class="mt-3">
+          <h5>Ingredientes</h5>
+          @for (ingredient of ingredients.controls; track $index) {
+          <div [formGroupName]="$index" class="d-flex mb-2">
+            <input formControlName="ingredient_name" class="form-control mr-2" placeholder="Ingrediente" />
+            <input formControlName="quantity" class="form-control mr-2" placeholder="Cantidad" />
+            <button type="button" class="btn btn-danger" (click)="removeIngredient($index)">Eliminar</button>
           </div>
+          }
           <button type="button" class="btn btn-primary mt-2" (click)="addIngredient()">Añadir Ingrediente</button>
         </div>
 
-
-  
-        <div class="form-group mt-3">
-          <label for="steps">Pasos</label>
-          <div formArrayName="steps">
-            @for (step of getSteps().controls; track $index) {
-            <div [formGroupName]="$index" class="d-flex mb-2">
-              <textarea formControlName="descripcion" class="form-control mr-2"
-                placeholder="Descripción del paso"></textarea>
-              <button type="button" class="btn btn-danger" (click)="removeStep($index)">Eliminar</button>
-            </div>
-            }
+      
+        <div formArrayName="steps" class="mt-3">
+          <h5>Pasos</h5>
+          @for (step of steps.controls; track $index) {
+          <div [formGroupName]="$index" class="d-flex mb-2">
+            <textarea formControlName="description" class="form-control mr-2" placeholder="Descripción del paso"></textarea>
+            <button type="button" class="btn btn-danger" (click)="removeStep($index)">Eliminar</button>
           </div>
+          }
           <button type="button" class="btn btn-primary mt-2" (click)="addStep()">Añadir Paso</button>
         </div>
 
-        <div class="form-group mt-3">
-          <label for="category">Categoría</label>
-          <select formControlName="category" id="category" class="form-control">
-            <option value="traditional">Traditional</option>
-            <option value="flexi">Flexi</option> 
-          </select>
-          @if (form.get('category')?.hasError('required') && form.get('category')?.touched) {
-          <span class="text-danger">
-            El campo categoría es <strong>requerido</strong>
-          </span>
-          }
-        </div>
-
-        <div class="form-group mt-3">
-          <div class="form-check">
-            <input formControlName="is_premium" type="checkbox" id="is_premium" class="form-check-input">
-            <label for="is_premium" class="form-check-label">Es Premium</label>
-          </div>
-        </div>
-
-    
+       
         <div class="form-group mt-3">
           <label for="serving_size">Tamaño de porción</label>
-          <input formControlName="serving_size" type="number" id="serving_size" class="form-control"
-            placeholder="Número de porciones">
+          <input formControlName="serving_size" type="number" id="serving_size" class="form-control" placeholder="Número de porciones">
         </div>
 
-  
         <div class="form-group mt-3">
           <label for="preparation_time">Tiempo de preparación (en minutos)</label>
-          <input formControlName="preparation_time" type="number" id="preparation_time" class="form-control"
-            placeholder="Tiempo en minutos">
+          <input formControlName="preparation_time" type="number" id="preparation_time" class="form-control" placeholder="Tiempo en minutos">
         </div>
 
-   
         <div class="form-group mt-3">
-          <label for="image">URL de la imagen</label>
-          <input formControlName="image" type="text" id="image" class="form-control"
-            placeholder="Ingrese la URL de la imagen">
+          <label for="image">Imagen (URL)</label>
+          <input formControlName="image" type="text" id="image" class="form-control" placeholder="Ingrese URL de la imagen">
         </div>
 
         <div class="mt-4 d-flex justify-content-between">
           <button type="button" class="btn btn-secondary" (click)="cancel()">Cancelar</button>
-          <button [disabled]="form.invalid" type="submit" class="btn btn-primary">Aceptar</button>
+          <button [disabled]="form.invalid" type="submit" class="btn btn-primary">Guardar</button>
         </div>
 
       </form>
     </div>
   </div>
 </div>-->
-
-<!--<div class="container mt-4">
-  <div class="card border-primary mb-3">
-    <div class="card-header">
-      @if (id === 0) {
-      Agregar Receta
-      } @else {
-      Editar Receta
-      }
-    </div>
-    <div class="card-body text-primary">
-      <form [formGroup]="form" (ngSubmit)="saveRecipe()">
-
-      
-        <div class="form-group">
-          <label for="title">Título</label>
-          <input formControlName="title" type="text" id="title" class="form-control" placeholder="Ingrese título">
-          @if (form.get('title')?.hasError('required') && form.get('title')?.touched) {
-          <span class="text-danger">
-            El campo título es <strong>requerido</strong>
-          </span>
-          }
-        </div>
-
-        <div class="form-group mt-3">
-          <label for="description">Descripción</label>
-          <textarea formControlName="description" id="description" class="form-control"
-            placeholder="Ingrese descripción"></textarea>
-          @if (form.get('description')?.hasError('required') && form.get('description')?.touched) {
-          <span class="text-danger">
-            El campo descripción es <strong>requerido</strong>
-          </span>
-          }
-        </div>
-
-        <div formArrayName="versions">
-          @for (version of getVersions().controls; track version) {
-          <div [formGroupName]="$index" class="border p-3 mb-3">
-            <div class="form-group">
-              <label for="version_name">Nombre de la versión</label>
-              <input formControlName="version_name" type="text" class="form-control"
-                placeholder="Ingrese el nombre de la versión">
-            </div>
-
-         
-            <div formArrayName="ingredients" class="mt-3">
-              <h5>Ingredientes</h5>
-              @for (ingredient of getIngredients($index).controls; track $index) {
-              <div [formGroupName]="$index" class="d-flex mb-2">
-                <input formControlName="ingredient_name" class="form-control mr-2" placeholder="Ingrediente" />
-                <input formControlName="imperial_quantity" class="form-control mr-2" placeholder="Cantidad Imperial" />
-                <input formControlName="metric_quantity" class="form-control mr-2" placeholder="Cantidad Métrica" />
-               
-                <button type="button" class="btn btn-danger"
-                  (click)="removeIngredient($index, $index)">Eliminar</button>
-              </div>
-              }
-              <button type="button" class="btn btn-primary mt-2" (click)="addIngredient($index)">Añadir Ingrediente</button>
-            </div>
-
-          
-            <div formArrayName="steps" class="mt-3">
-              <h5>Pasos</h5>
-              @for (step of getSteps($index).controls; track $index) {
-              <div [formGroupName]="$index" class="d-flex mb-2">
-                <textarea formControlName="description" class="form-control mr-2"
-                  placeholder="Descripción del paso"></textarea>
-             
-                <button type="button" class="btn btn-danger" (click)="removeStep($index, $index)">Eliminar</button>
-              </div>
-              }
-              <button type="button" class="btn btn-primary mt-2" (click)="addStep($index)">Añadir Paso</button>
-            </div>
-
-            <button type="button" class="btn btn-danger mt-3" (click)="removeVersion($index)">Eliminar Versión</button>
-
-          </div>
-          }
-          <button type="button" class="btn btn-primary mt-3" (click)="addVersion()">Añadir Versión</button>
-        </div>
-
-        <div class="form-group mt-3">
-          <label for="serving_size">Tamaño de porción</label>
-          <input formControlName="serving_size" type="number" id="serving_size" class="form-control"
-            placeholder="Número de porciones">
-        </div>
-
-     
-        <div class="form-group mt-3">
-          <label for="preparation_time">Tiempo de preparación (en minutos)</label>
-          <input formControlName="preparation_time" type="number" id="preparation_time" class="form-control"
-            placeholder="Tiempo en minutos">
-        </div>
-
-    
-        <div class="form-group mt-3">
-          <label for="image">URL de la imagen</label>
-          <input formControlName="image" type="text" id="image" class="form-control"
-            placeholder="Ingrese la URL de la imagen">
-        </div>
-
-    
-        <div class="form-group mt-3">
-          <div class="form-check">
-            <input formControlName="is_premium" type="checkbox" id="is_premium" class="form-check-input">
-            <label for="is_premium" class="form-check-label">Es Premium</label>
-          </div>
-        </div>
-
-      
-        <div class="mt-4 d-flex justify-content-between">
-          <button type="button" class="btn btn-secondary" (click)="cancel()">Cancelar</button>
-          <button [disabled]="form.invalid" type="submit" class="btn btn-primary">Aceptar</button>
-        </div>
-
-      </form> 
-    </div>
-  </div>
-</div>
--->
-
 <div class="container mt-4">
   <div class="card border-primary mb-3">
     <div class="card-header">
-      Editar Receta
+      {{ id !== 0 ? 'Editar Receta' : 'Añadir Nueva Receta' }}
     </div>
     <div class="card-body text-primary">
       <form [formGroup]="form" (ngSubmit)="saveRecipe()">
@@ -259,51 +84,29 @@
         <!-- Descripción -->
         <div class="form-group mt-3">
           <label for="description">Descripción</label>
-          <textarea formControlName="description" id="description" class="form-control"
-            placeholder="Ingrese descripción"></textarea>
+          <textarea formControlName="description" id="description" class="form-control" placeholder="Ingrese descripción"></textarea>
         </div>
 
-       <!-- Versión -->
-<div formArrayName="versions">
-  <h5>Versiones</h5>
-  @for (version of getVersions().controls; track $index) {
-  <div [formGroupName]="$index" class="border p-3 mb-3">
-    <div class="form-group">
-      <label for="version_name">Nombre de la versión</label>
-      <input formControlName="version_name" type="text" class="form-control" placeholder="Ingrese el nombre de la versión">
-    </div>
+        <!-- Ingredientes -->
+        <div formArrayName="ingredients" class="mt-3">
+          <h5>Ingredientes</h5>
+          @for (ingredient of ingredients.controls; track $index) {
+          <div [formGroupName]="$index" class="d-flex mb-2">
+            <input formControlName="ingredient_name" class="form-control mr-2" placeholder="Ingrediente" />
+            <input formControlName="quantity" class="form-control mr-2" placeholder="Cantidad" />
+            <button type="button" class="btn btn-danger" (click)="removeIngredient($index)">Eliminar</button>
+          </div>
+          }
+          <button type="button" class="btn btn-primary mt-2" (click)="addIngredient()">Añadir Ingrediente</button>
+        </div>
 
-    <!-- Ingredientes -->
-    <div formArrayName="ingredients" class="mt-3">
-      <h6>Ingredientes</h6>
-      @for (ingredient of getIngredients($index).controls; track $index) {
-      <div [formGroupName]="$index" class="d-flex mb-2">
-        <input formControlName="ingredient_name" class="form-control mr-2" placeholder="Ingrediente" />
-        <input formControlName="imperial_quantity" class="form-control mr-2" placeholder="Cantidad Imperial" />
-        <input formControlName="metric_quantity" class="form-control mr-2" placeholder="Cantidad Métrica" />
-        <button type="button" class="btn btn-danger" (click)="removeIngredient($index, $index)">Eliminar</button>
-      </div>
-      }
-      <button type="button" class="btn btn-primary mt-2" (click)="addIngredient($index)">Añadir Ingrediente</button>
-    </div>
+               <!-- Pasos -->
+               <div class="form-group mt-3">
+                <label for="steps">Pasos</label>
+                <textarea formControlName="steps" id="steps" class="form-control" placeholder="Ingrese los pasos separados por saltos de línea"></textarea>
+              </div>
+      
 
-    <!-- Pasos -->
-    <div formArrayName="steps" class="mt-3">
-      <h6>Pasos</h6>
-      @for (step of getSteps($index).controls; track $index) {
-      <div [formGroupName]="$index" class="d-flex mb-2">
-        <textarea formControlName="description" class="form-control mr-2" placeholder="Descripción del paso"></textarea>
-        <button type="button" class="btn btn-danger" (click)="removeStep($index, $index)">Eliminar</button>
-      </div>
-      }
-      <button type="button" class="btn btn-primary mt-2" (click)="addStep($index)">Añadir Paso</button>
-    </div>
-
-    <button type="button" class="btn btn-danger mt-3" (click)="removeVersion($index)">Eliminar Versión</button>
-  </div>
-  }
-  <button type="button" class="btn btn-primary mt-3" (click)="addVersion()">Añadir Versión</button>
-</div>
         <!-- Otros campos como tamaño de porción y tiempo de preparación -->
         <div class="form-group mt-3">
           <label for="serving_size">Tamaño de porción</label>
@@ -315,9 +118,14 @@
           <input formControlName="preparation_time" type="number" id="preparation_time" class="form-control" placeholder="Tiempo en minutos">
         </div>
 
+        <div class="form-group mt-3">
+          <label for="image">Imagen (URL)</label>
+          <input formControlName="image" type="text" id="image" class="form-control" placeholder="Ingrese URL de la imagen">
+        </div>
+
         <div class="mt-4 d-flex justify-content-between">
           <button type="button" class="btn btn-secondary" (click)="cancel()">Cancelar</button>
-          <button [disabled]="form.invalid" type="submit" class="btn btn-primary">Aceptar</button>
+          <button [disabled]="form.invalid" type="submit" class="btn btn-primary">Guardar</button>
         </div>
 
       </form>
