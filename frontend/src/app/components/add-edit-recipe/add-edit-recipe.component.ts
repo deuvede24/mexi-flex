@@ -40,8 +40,8 @@ export class AddEditRecipeComponent implements OnInit {
       preparation_time: [0, Validators.required],
       image: [''],  // Campo para la URL de la imagen
       ingredients: this.fb.array([]),  // Array de ingredientes
-      steps: this.fb.array([]),  // Array de pasos
-     // steps: ['', Validators.required]  // Campo de texto para los pasos
+      //steps: this.fb.array([]),  // Array de pasos
+     steps: ['', Validators.required]  // Campo de texto para los pasos
     });
 
     this.id = Number(this.aRouter.snapshot.paramMap.get('id') || 0);
@@ -209,7 +209,7 @@ export class AddEditRecipeComponent implements OnInit {
           serving_size: recipeData.serving_size,
           preparation_time: recipeData.preparation_time,
           image: recipeData.image,
-         // steps: recipeData.steps // Aquí asignamos los pasos como un simple string
+          steps: recipeData.steps // Aquí asignamos los pasos como un simple string
         });
         console.log('Form after patching:', this.form.value);
 
@@ -265,6 +265,7 @@ export class AddEditRecipeComponent implements OnInit {
       id: this.id,
       ...formValue,
      // steps: formValue.steps // Asegurarse de que los pasos sean un string de texto
+     steps: formValue.steps // Guardamos los pasos como un string
     };
 
     this.loading = true;

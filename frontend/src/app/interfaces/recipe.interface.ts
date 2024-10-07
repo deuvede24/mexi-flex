@@ -19,7 +19,7 @@ export interface Recipe {
   image?: string;
   created_at: Date;
   RecipeIngredients: RecipeIngredient[];  // Array de ingredientes
-  steps: Step[];  // Array de pasos
-  //steps: string;  // Ahora steps es un string, no un array
+  //steps: Step[];  // Array de pasos
+  steps: string;  // Ahora steps es un string, no un array
 }
 
