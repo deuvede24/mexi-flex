@@ -28,19 +28,49 @@ export class ViewRecipeComponent implements OnInit {
     }
   }
 
+
+  /* getRecipeById(id: number) {
+     this.loading = true;
+     this.recipeService.getRecipeById(id).subscribe({
+       next: (response: { code: number; message: string; data: Recipe }) => {
+         console.log('Recipe data received:', response.data);
+         if (response.data && typeof response.data.steps === 'string') {
+           this.recipe = response.data;
+         } else {
+           this.recipe = { ...response.data, steps: '' };  // Establece steps como una cadena vacía si no es string
+         }
+         this.loading = false;
+       },
+       error: () => {
+         this.loading = false;
+       }
+     });
+   }*/
+
   getRecipeById(id: number) {
     this.loading = true;
     this.recipeService.getRecipeById(id).subscribe({
       next: (response: { code: number; message: string; data: Recipe }) => {
-        this.recipe = response.data;
+        console.log('Recipe data received:', response.data);
+
+        // Verifica si steps es un string, si no, lo inicializa como un string vacío.
+        if (response.data && typeof response.data.steps === 'string') {
+          this.recipe = response.data;
+        } else {
+          this.recipe = { ...response.data, steps: '' };  // Establece steps como una cadena vacía si no es string
+        }
+
         this.loading = false;
       },
       error: () => {
-        // Maneja el error
         this.loading = false;
       }
     });
+
   }
 
+
+
 }
+
 

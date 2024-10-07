@@ -34,16 +34,22 @@
   <h5>Ingredientes</h5>
   <ul>
     @for (ingredient of recipe?.RecipeIngredients; track ingredient) {
-      <li>{{ ingredient.ingredient_name }} - {{ ingredient.quantity }}</li>
+    <li>{{ ingredient.ingredient_name }} - {{ ingredient.quantity }}</li>
     }
   </ul>
 
   <h5>Pasos</h5>
   <ul>
-    @for (step of recipe?.steps; track step) {
-      <li>{{ step.description }}</li>
+    <!-- Verificamos que recipe y steps existen y no son nulos -->
+    @if (recipe?.steps && recipe.steps.trim().length > 0) {
+    @for (step of recipe.steps.split('\n'); track $index) {
+    <li>{{ step }}</li>
+    }
+    } @else {
+    <li>No hay pasos disponibles</li>
     }
   </ul>
+
 
   <div class="mt-3">
     <button class="btn btn-primary" routerLink="/recipes">Volver a Recetas</button>

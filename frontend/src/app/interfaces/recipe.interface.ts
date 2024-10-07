@@ -4,9 +4,9 @@ export interface RecipeIngredient {
   quantity: string;  // Modifica según tu estructura real
 }
 
-export interface Step {
+/*export interface Step {
   description: string;
-}
+}*/
 
 
 export interface Recipe {
