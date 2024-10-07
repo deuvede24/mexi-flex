@@ -39,16 +39,8 @@
   </ul>
 
   <h5>Pasos</h5>
-  <ul>
-    <!-- Verificamos que recipe y steps existen y no son nulos -->
-    @if (recipe?.steps && recipe.steps.trim().length > 0) {
-    @for (step of recipe.steps.split('\n'); track $index) {
-    <li>{{ step }}</li>
-    }
-    } @else {
-    <li>No hay pasos disponibles</li>
-    }
-  </ul>
+  <pre>{{ recipe?.steps }}</pre>
+  
 
 
   <div class="mt-3">
