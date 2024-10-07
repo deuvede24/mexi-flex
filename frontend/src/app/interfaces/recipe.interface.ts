@@ -13,6 +13,7 @@ export interface Recipe {
   id_recipe: number;
   title: string;
   description: string;
+  category:string,
   is_premium: boolean;
   serving_size: number;
   preparation_time: number;

@@ -114,6 +114,7 @@ export class AddEditRecipeComponent implements OnInit {
         this.form.patchValue({
           title: recipeData.title,
           description: recipeData.description,
+          category: recipeData.category,
           is_premium: recipeData.is_premium,
           serving_size: recipeData.serving_size,
           preparation_time: recipeData.preparation_time,
