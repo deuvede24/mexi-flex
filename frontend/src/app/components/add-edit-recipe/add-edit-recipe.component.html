@@ -15,7 +15,23 @@
         <!-- Descripción -->
         <div class="form-group mt-3">
           <label for="description">Descripción</label>
-          <textarea formControlName="description" id="description" class="form-control" placeholder="Ingrese descripción"></textarea>
+          <textarea formControlName="description" id="description" class="form-control"
+            placeholder="Ingrese descripción"></textarea>
+        </div>
+
+        <!-- Selección de Categoría -->
+        <div class="form-group">
+          <label for="category">Categoría</label>
+          <select formControlName="category" id="category" class="form-control">
+            <option value="tradicional">Tradicional</option>
+            <option value="flexi">Flexi</option>
+          </select>
+        </div>
+
+        <!-- Es Premium -->
+        <div class="form-group mt-3">
+          <label for="is_premium">¿Es Premium?</label>
+          <input type="checkbox" formControlName="is_premium" id="is_premium" class="form-check-input">
         </div>
 
         <!-- Ingredientes -->
@@ -31,27 +47,31 @@
           <button type="button" class="btn btn-primary mt-2" (click)="addIngredient()">Añadir Ingrediente</button>
         </div>
 
-               <!-- Pasos -->
-               <div class="form-group mt-3">
-                <label for="steps">Pasos</label>
-                <textarea formControlName="steps" id="steps" class="form-control" placeholder="Ingrese los pasos separados por saltos de línea"></textarea>
-              </div>
-      
+        <!-- Pasos -->
+        <div class="form-group mt-3">
+          <label for="steps">Pasos</label>
+          <textarea formControlName="steps" id="steps" class="form-control"
+            placeholder="Ingrese los pasos separados por saltos de línea"></textarea>
+        </div>
+
 
         <!-- Otros campos como tamaño de porción y tiempo de preparación -->
         <div class="form-group mt-3">
           <label for="serving_size">Tamaño de porción</label>
-          <input formControlName="serving_size" type="number" id="serving_size" class="form-control" placeholder="Número de porciones">
+          <input formControlName="serving_size" type="number" id="serving_size" class="form-control"
+            placeholder="Número de porciones">
         </div>
 
         <div class="form-group mt-3">
           <label for="preparation_time">Tiempo de preparación (en minutos)</label>
-          <input formControlName="preparation_time" type="number" id="preparation_time" class="form-control" placeholder="Tiempo en minutos">
+          <input formControlName="preparation_time" type="number" id="preparation_time" class="form-control"
+            placeholder="Tiempo en minutos">
         </div>
 
         <div class="form-group mt-3">
           <label for="image">Imagen (URL)</label>
-          <input formControlName="image" type="text" id="image" class="form-control" placeholder="Ingrese URL de la imagen">
+          <input formControlName="image" type="text" id="image" class="form-control"
+            placeholder="Ingrese URL de la imagen">
         </div>
 
         <div class="mt-4 d-flex justify-content-between">

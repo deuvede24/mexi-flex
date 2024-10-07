@@ -521,6 +521,7 @@ export const updateRecipe = async (req, res) => {
   try {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
+      console.log('Errores de validación:', errors.array());
       return res.status(400).json({ errors: errors.array() });
     }
 
@@ -528,14 +529,23 @@ export const updateRecipe = async (req, res) => {
     const recipe = await Recipe.findByPk(id);
 
     if (!recipe) {
+      console.log(`Receta no encontrada con ID: ${id}`);
       return res.status(404).json({
         code: -3,
         message: "Recipe not found",
       });
     }
 
+      // Mostrar los datos recibidos en el body
+      console.log('Datos recibidos en el body:', req.body);
+
     const { title, description, category, steps, is_premium, serving_size = 1, preparation_time = 0, image, ingredients } = req.body;
 
+
+    // Mostrar los datos antes de actualizar la receta
+    console.log('Datos antes de actualizar la receta:', {
+      title, description, category, steps, is_premium, serving_size, preparation_time, image, ingredients
+    });
     // Actualizamos los datos principales de la receta
     await recipe.update({
       title,
@@ -547,6 +557,7 @@ export const updateRecipe = async (req, res) => {
       preparation_time,
       image,
     });
+//////////////////////////
 
     // Actualizar ingredientes
     const currentIngredients = await RecipeIngredient.findAll({
@@ -562,10 +573,13 @@ export const updateRecipe = async (req, res) => {
       if (currentIngredientMap[ingredient.ingredient_name]) {
         const existingIngredient = currentIngredientMap[ingredient.ingredient_name];
         if (existingIngredient.quantity !== ingredient.quantity) {
+          console.log(`Actualizando ingrediente: ${ingredient.ingredient_name} con cantidad: ${ingredient.quantity}`);
           await existingIngredient.update({ quantity: ingredient.quantity });
         }
         delete currentIngredientMap[ingredient.ingredient_name];
       } else {
+        // Si el ingrediente no existe, crear uno nuevo
+        console.log(`Creando nuevo ingrediente: ${ingredient.ingredient_name} con cantidad: ${ingredient.quantity}`);
         await RecipeIngredient.create({
           recipe_id: id,
           ingredient_name: ingredient.ingredient_name,
@@ -576,6 +590,7 @@ export const updateRecipe = async (req, res) => {
 
     const ingredientsToRemove = Object.values(currentIngredientMap);
     for (const ingredient of ingredientsToRemove) {
+      console.log(`Eliminando ingrediente: ${ingredient.ingredient_name}`);
       await ingredient.destroy();
     }
 

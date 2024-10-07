@@ -35,6 +35,7 @@ export class AddEditRecipeComponent implements OnInit {
     this.form = this.fb.group({
       title: ['', Validators.required],
       description: ['', Validators.required],
+      category: ['', Validators.required],  // Añadir este campo al formulario
       is_premium: [false, Validators.required],
       serving_size: [1, Validators.required],
       preparation_time: [0, Validators.required],
