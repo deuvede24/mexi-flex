@@ -5,17 +5,17 @@ import { validationResult } from "express-validator";
 // Obtener todas las recetas (manejando guest para ver solo 5 recetas)
 export const getRecipes = async (req, res) => {
   try {
-    const userRole = req.user ? req.user.roles : 'guest';
+    const userRole = req.user ? req.user.roles : "guest";
     let recipes;
 
-    if (userRole === 'guest') {
+    if (userRole === "guest") {
       recipes = await Recipe.findAll({
         limit: 5,
-        order: [['created_at', 'DESC']],  // Las más recientes
+        order: [["created_at", "DESC"]], // Las más recientes
       });
     } else {
       recipes = await Recipe.findAll({
-        include: RecipeIngredient  // Incluimos los ingredientes
+        include: RecipeIngredient, // Incluimos los ingredientes
       });
     }
 
@@ -38,7 +38,7 @@ export const getRecipeById = async (req, res) => {
   try {
     const { id } = req.params;
     const recipe = await Recipe.findByPk(id, {
-      include: RecipeIngredient,  // Incluimos los ingredientes relacionados
+      include: RecipeIngredient, // Incluimos los ingredientes relacionados
     });
 
     if (!recipe) {
@@ -65,14 +65,45 @@ export const getRecipeById = async (req, res) => {
 // Añadir una nueva receta con ingredientes
 export const addRecipe = async (req, res) => {
   try {
+    console.log("Request body:", req.body);
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
       return res.status(400).json({ errors: errors.array() });
     }
 
-    const { title, description, category, steps, is_premium, serving_size = 1, preparation_time = 0, image, ingredients } = req.body;
+    const {
+      title,
+      description,
+      category,
+      steps,
+      is_premium,
+      serving_size = 1,
+      preparation_time = 0,
+      image,
+      ingredients,
+    } = req.body;
 
-    if (!title || !description || !category || !steps || is_premium === undefined || !ingredients) {
+    console.log("Datos para crear la receta:", {
+      title,
+      description,
+      category,
+      steps,
+      is_premium,
+      serving_size,
+      preparation_time,
+      image,
+    });
+
+    if (
+      !title ||
+      !description ||
+      !category ||
+      !steps ||
+      is_premium === undefined ||
+      !ingredients ||
+      !serving_size ||
+      preparation_time === undefined
+    ) {
       return res.status(400).json({
         code: -2,
         message: "Missing required fields",
@@ -91,13 +122,18 @@ export const addRecipe = async (req, res) => {
       image,
     });
 
+    console.log("Receta creada con éxito:", newRecipe.id_recipe);
+
     // Crear los ingredientes relacionados
-    const ingredientsToAdd = ingredients.map(ingredient => ({
+    const ingredientsToAdd = ingredients.map((ingredient) => ({
       recipe_id: newRecipe.id_recipe,
       ingredient_name: ingredient.ingredient_name,
       quantity: ingredient.quantity,
     }));
+
+    console.log("Ingredientes a añadir:", ingredientsToAdd);
     await RecipeIngredient.bulkCreate(ingredientsToAdd);
+    console.log("Ingredientes añadidos correctamente");
 
     res.status(200).json({
       code: 1,
@@ -105,6 +141,7 @@ export const addRecipe = async (req, res) => {
       data: newRecipe,
     });
   } catch (error) {
+    console.error("Error in addRecipe:", error);
     console.error(error);
     res.status(500).json({
       code: -100,
@@ -118,7 +155,7 @@ export const updateRecipe = async (req, res) => {
   try {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
-      console.log('Errores de validación:', errors.array());
+      console.log("Errores de validación:", errors.array());
       return res.status(400).json({ errors: errors.array() });
     }
 
@@ -133,15 +170,32 @@ export const updateRecipe = async (req, res) => {
       });
     }
 
-      // Mostrar los datos recibidos en el body
-      console.log('Datos recibidos en el body:', req.body);
+    // Mostrar los datos recibidos en el body
+    console.log("Datos recibidos en el body:", req.body);
 
-    const { title, description, category, steps, is_premium, serving_size = 1, preparation_time = 0, image, ingredients } = req.body;
-
+    const {
+      title,
+      description,
+      category,
+      steps,
+      is_premium,
+      serving_size = 1,
+      preparation_time = 0,
+      image,
+      ingredients,
+    } = req.body;
 
     // Mostrar los datos antes de actualizar la receta
-    console.log('Datos antes de actualizar la receta:', {
-      title, description, category, steps, is_premium, serving_size, preparation_time, image, ingredients
+    console.log("Datos antes de actualizar la receta:", {
+      title,
+      description,
+      category,
+      steps,
+      is_premium,
+      serving_size,
+      preparation_time,
+      image,
+      ingredients,
     });
     // Actualizamos los datos principales de la receta
     await recipe.update({
@@ -154,29 +208,37 @@ export const updateRecipe = async (req, res) => {
       preparation_time,
       image,
     });
-//////////////////////////
+    //////////////////////////
 
     // Actualizar ingredientes
     const currentIngredients = await RecipeIngredient.findAll({
-      where: { recipe_id: id }
+      where: { recipe_id: id },
     });
 
-    const currentIngredientMap = currentIngredients.reduce((map, ingredient) => {
-      map[ingredient.ingredient_name] = ingredient;
-      return map;
-    }, {});
+    const currentIngredientMap = currentIngredients.reduce(
+      (map, ingredient) => {
+        map[ingredient.ingredient_name] = ingredient;
+        return map;
+      },
+      {}
+    );
 
     for (const ingredient of ingredients) {
       if (currentIngredientMap[ingredient.ingredient_name]) {
-        const existingIngredient = currentIngredientMap[ingredient.ingredient_name];
+        const existingIngredient =
+          currentIngredientMap[ingredient.ingredient_name];
         if (existingIngredient.quantity !== ingredient.quantity) {
-          console.log(`Actualizando ingrediente: ${ingredient.ingredient_name} con cantidad: ${ingredient.quantity}`);
+          console.log(
+            `Actualizando ingrediente: ${ingredient.ingredient_name} con cantidad: ${ingredient.quantity}`
+          );
           await existingIngredient.update({ quantity: ingredient.quantity });
         }
         delete currentIngredientMap[ingredient.ingredient_name];
       } else {
         // Si el ingrediente no existe, crear uno nuevo
-        console.log(`Creando nuevo ingrediente: ${ingredient.ingredient_name} con cantidad: ${ingredient.quantity}`);
+        console.log(
+          `Creando nuevo ingrediente: ${ingredient.ingredient_name} con cantidad: ${ingredient.quantity}`
+        );
         await RecipeIngredient.create({
           recipe_id: id,
           ingredient_name: ingredient.ingredient_name,
@@ -223,7 +285,16 @@ export const patchRecipe = async (req, res) => {
       });
     }
 
-    const { title, description, category, steps, is_premium, serving_size = 1, preparation_time = 0, image } = req.body;
+    const {
+      title,
+      description,
+      category,
+      steps,
+      is_premium,
+      serving_size = 1,
+      preparation_time = 0,
+      image,
+    } = req.body;
 
     // Actualizar solo los campos proporcionados
     const updateData = {};
@@ -233,7 +304,8 @@ export const patchRecipe = async (req, res) => {
     if (steps !== undefined) updateData.steps = steps;
     if (is_premium !== undefined) updateData.is_premium = is_premium;
     if (serving_size !== undefined) updateData.serving_size = serving_size;
-    if (preparation_time !== undefined) updateData.preparation_time = preparation_time;
+    if (preparation_time !== undefined)
+      updateData.preparation_time = preparation_time;
     if (image !== undefined) updateData.image = image;
 
     await recipe.update(updateData);
@@ -279,4 +351,3 @@ export const deleteRecipe = async (req, res) => {
     });
   }
 };
-

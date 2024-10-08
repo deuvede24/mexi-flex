@@ -67,8 +67,8 @@ export class AddEditRecipeComponent implements OnInit {
     return this.form.get('steps') as FormControl;
   }
 
-  
-  
+
+
 
 
   createIngredient(): FormGroup {
@@ -93,20 +93,20 @@ export class AddEditRecipeComponent implements OnInit {
   }*/
 
 
- /* addStep() {
-    this.steps.push(this.createStep());
-  }
-
-  removeStep(index: number) {
-    this.steps.removeAt(index);
-  }*/
+  /* addStep() {
+     this.steps.push(this.createStep());
+   }
+ 
+   removeStep(index: number) {
+     this.steps.removeAt(index);
+   }*/
 
   getRecipeById(id: number) {
     this.loading = true;
     this.recipeService.getRecipeById(id).subscribe({
       next: (response: { code: number; message: string; data: Recipe }) => {
         const recipeData = response.data;
-        
+
 
         console.log('Recipe Data received from API:', recipeData); // Verifica la estructura completa de los datos recibidos
 
@@ -120,9 +120,9 @@ export class AddEditRecipeComponent implements OnInit {
           preparation_time: recipeData.preparation_time,
           image: recipeData.image,
           //ingredients: recipeData.RecipeIngredients||[],
-          steps: recipeData.steps|| ''  // Aquí asignamos los pasos como un simple string
+          steps: recipeData.steps || ''  // Aquí asignamos los pasos como un simple string
         });
-       
+
 
         // Cargar ingredientes y pasos
         this.ingredients.clear();
@@ -133,7 +133,7 @@ export class AddEditRecipeComponent implements OnInit {
               //quantity: ingredient.quantity
 
               ingredient_name: [ingredient.ingredient_name, Validators.required],
-            quantity: [ingredient.quantity, Validators.required]
+              quantity: [ingredient.quantity, Validators.required]
             }));
           });
         }
@@ -153,7 +153,7 @@ export class AddEditRecipeComponent implements OnInit {
 
 
   // Guardar o actualizar la receta
-  saveRecipe() {
+ /* saveRecipe() {
     if (this.form.invalid) {
       this.notificationService.showError('Por favor, complete todos los campos.');
       return;
@@ -167,8 +167,13 @@ export class AddEditRecipeComponent implements OnInit {
       ...formValue,
       // steps: formValue.steps // Asegurarse de que los pasos sean un string de texto
       steps: formValue.steps.trim() // Guardamos los pasos como un string
-      
+
     };
+
+    // Si es una receta nueva, eliminamos el campo `id` antes de enviarla al backend
+    if (this.id === 0) {
+      delete recipe.id;
+    }
 
     this.loading = true;
 
@@ -190,16 +195,97 @@ export class AddEditRecipeComponent implements OnInit {
       this.recipeService.addRecipe(recipe).subscribe({
         next: () => {
           this.notificationService.showSuccess('Receta registrada con éxito.');
-          // this.loading = false;
+          this.loading = false;
           this.router.navigate(['/recipes']);
         },
-        error: () => {
+        error: (err) => {
+          console.error('Error al registrar la receta:', err);
           this.notificationService.showError('Error al registrar la receta.');
           this.loading = false;
         }
       });
     }
-  }
+  }*/
+
+    saveRecipe() {
+      if (this.form.invalid) {
+        this.notificationService.showError('Por favor, complete todos los campos.');
+        return;
+      }
+    
+      // Validación para `preparation_time`
+      if (typeof this.form.value.preparation_time !== 'number' || this.form.value.preparation_time <= 0) {
+        this.notificationService.showError('El tiempo de preparación debe ser un número positivo.');
+        return;
+      }
+    
+      // Validación para `image` (si es que no es opcional)
+      if (this.form.value.image && !['jpg', 'jpeg', 'png'].includes(this.form.value.image.split('.').pop().toLowerCase())) {
+        this.notificationService.showError('La imagen debe tener una extensión válida (jpg, jpeg, png).');
+        return;
+      }
+    
+      const formValue = this.form.value;
+      console.log('Form Value antes de enviar al backend:', formValue);
+    
+      const recipe = {
+        id: this.id,
+        ...formValue,
+        image: formValue.image || 'default_image.jpg', // Imagen por defecto si no se proporciona una
+        steps: formValue.steps.trim()
+      };
+    
+      if (this.id === 0) {
+        delete recipe.id;
+      }
+    
+      this.loading = true;
+    
+      console.log('Datos de la receta antes de enviarlos:', recipe);
+    
+      if (this.id !== 0) {
+        this.recipeService.updateRecipe(this.id, recipe).subscribe({
+          next: (response) => {
+            console.log('Respuesta completa del servidor al actualizar receta:', response);
+            this.notificationService.showSuccess('Receta actualizada con éxito.');
+            this.router.navigate(['/recipes']);
+            this.loading = false;
+          },
+          error: (err) => {
+            console.error('Error al actualizar la receta:', err);
+            this.notificationService.showError('Error al actualizar la receta.');
+            this.loading = false;
+          }
+        });
+      } else {
+        this.recipeService.addRecipe(recipe).subscribe({
+          next: (response) => {
+            console.log('Respuesta completa del servidor al añadir receta:', response);
+            if (response && response.code === 1) {
+              this.notificationService.showSuccess('Receta registrada con éxito.');
+              this.loading = false;
+              this.router.navigate(['/recipes']);
+            } else {
+              console.error('Respuesta inesperada del servidor:', response);
+              this.notificationService.showError('Error al registrar la receta. Respuesta inesperada del servidor.');
+              this.loading = false;
+            }
+          },
+          error: (err) => {
+            console.error('Error al registrar la receta:', err);
+            if (err.error && err.error.errors) {
+              err.error.errors.forEach((error: any) => {
+                this.notificationService.showError(`Error: ${error.msg}`);
+              });
+            } else {
+              this.notificationService.showError('Error al registrar la receta.');
+            }
+            this.loading = false;
+          }
+        });
+      }
+    }
+    
 
   cancel() {
     this.router.navigate(['/recipes']);
