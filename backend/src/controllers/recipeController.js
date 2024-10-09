@@ -6,9 +6,14 @@ import { validationResult } from "express-validator";
 export const getRecipes = async (req, res) => {
   try {
     const userRole = req.user ? req.user.roles : "guest";
-    let recipes;
+    console.log("Rol del usuario en el controlador de recetas:", userRole); 
 
+    let recipes;
+    console.log("Rol del usuario:", userRole); // Para depurar
+    console.log("Usuario detectado:", req.user);
     if (userRole === "guest") {
+ 
+      console.log("ID del usuario:", req.user?.id_user);
       recipes = await Recipe.findAll({
         limit: 5,
         order: [["created_at", "DESC"]], // Las más recientes
@@ -65,6 +70,14 @@ export const getRecipeById = async (req, res) => {
 // Añadir una nueva receta con ingredientes
 export const addRecipe = async (req, res) => {
   try {
+    //////////////////////////////////
+    // Verificar si el usuario es admin
+    if (req.user.roles !== "admin") {
+      return res.status(403).json({
+        code: -10,
+        message: "No tienes permisos para realizar esta acción.",
+      });
+    }
     console.log("Request body:", req.body);
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
@@ -153,6 +166,14 @@ export const addRecipe = async (req, res) => {
 // Actualizar una receta existente con ingredientes
 export const updateRecipe = async (req, res) => {
   try {
+    ///////////////////////////
+    // Verificar si el usuario es admin
+    if (req.user.roles !== "admin") {
+      return res.status(403).json({
+        code: -10,
+        message: "No tienes permisos para realizar esta acción.",
+      });
+    } ///
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
       console.log("Errores de validación:", errors.array());
@@ -327,6 +348,14 @@ export const patchRecipe = async (req, res) => {
 // Eliminar una receta junto con sus ingredientes
 export const deleteRecipe = async (req, res) => {
   try {
+    //////////////////
+    // Verificar si el usuario es admin
+    if (req.user.roles !== "admin") {
+      return res.status(403).json({
+        code: -10,
+        message: "No tienes permisos para realizar esta acción.",
+      });
+    } ///////
     const { id } = req.params;
 
     await RecipeIngredient.destroy({ where: { recipe_id: id } });

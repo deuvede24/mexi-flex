@@ -14,7 +14,7 @@ export class RecipeService {
 
 
   // Obtener todas las recetas con código, mensaje y data
- getRecipes(): Observable<{ code: number; message: string; data: Recipe[] }> {
+  getRecipes(): Observable<{ code: number; message: string; data: Recipe[] }> {
     return this.http.get<{ code: number; message: string; data: Recipe[] }>(this.apiUrl, { withCredentials: true });
   }
 
@@ -43,13 +43,13 @@ export class RecipeService {
     return this.http.post<{ code: number; message: string; data: Recipe }>(this.apiUrl, recipe, { withCredentials: true });
   }
 
- /* getRecipeCategoryCount() {
-    return this.http.get<{ code: number; message: string; data: any[] }>('/recipes/category-count');
-  }*/
+  /* getRecipeCategoryCount() {
+     return this.http.get<{ code: number; message: string; data: any[] }>('/recipes/category-count');
+   }*/
 
   getRecipeCategoryCount(): Observable<{ code: number; message: string; data: any[] }> {
     return this.http.get<{ code: number; message: string; data: any[] }>(`${this.apiUrl}/category-count`, { withCredentials: true });
   }
-  
+
 
 }
