@@ -18,6 +18,7 @@ export class AuthService {
     this.router = router;
   }
 
+  // Registrar un usuario
   register(user: User): Observable<AuthResponse> {
     return this.httpClient.post<AuthResponse>(`${this.apiUrl}/auth/register`, user).pipe(
       tap((response: AuthResponse) => {
@@ -29,6 +30,7 @@ export class AuthService {
     );
   }
 
+  // Iniciar sesión de un usuario
   login(user: Login): Observable<AuthResponse> {
     return this.httpClient.post<AuthResponse>(`${this.apiUrl}/auth/login`, user, { withCredentials: true }).pipe(
       tap((response: AuthResponse) => {
@@ -40,104 +42,52 @@ export class AuthService {
     );
   }
 
- /* isLoggedIn(): boolean {
-    return !!localStorage.getItem('token');
-  }*/
-    isLoggedIn(): boolean {
-      const loggedIn = !!localStorage.getItem('token');
-      console.log("¿Está logueado?", loggedIn);
-      return loggedIn;
-    }
-
-  // Simplificar para que todos los usuarios sean administradores.
-  isAdmin(): boolean {
-   // return true;
-   const user = this.getUser();
-  return user?.id_user === 1; 
+  // Verificar si el usuario está logueado
+  isLoggedIn(): boolean {
+    const loggedIn = !!localStorage.getItem('token');
+    console.log("¿Está logueado?", loggedIn);
+    return loggedIn;
   }
 
- /* getUser(): User | null {
-    if (this.currentUser) {
-      return this.currentUser;
-    } else {
-      const userString = localStorage.getItem('user');
-      if (userString) {
-        try {
-          const user = JSON.parse(userString);
-          this.currentUser = user;
-          return user;
-        } catch (e) {
-          console.error("Error al parsear el usuario del localStorage:", e);
-          return null;
-        }
+  // Verificar si el usuario es admin
+  isAdmin(): boolean {
+    const user = this.getUser();
+    return user?.id_user === 1; 
+  }
+
+  // Obtener el usuario logueado del localStorage
+  getUser(): User | null {
+    const userString = localStorage.getItem('user');
+    console.log("Usuario obtenido del localStorage:", userString);
+    if (userString) {
+      try {
+        const user = JSON.parse(userString);
+        this.currentUser = user;
+        return user;
+      } catch (e) {
+        console.error("Error al parsear el usuario del localStorage:", e);
+        return null;
       }
-      return null;
     }
-  }*/
-    getUser(): User | null {
-      const userString = localStorage.getItem('user');
-      console.log("Usuario obtenido del localStorage:", userString);
-      if (userString) {
-        try {
-          const user = JSON.parse(userString);
-          this.currentUser = user;
-          return user;
-        } catch (e) {
-          console.error("Error al parsear el usuario del localStorage:", e);
-          return null;
-        }
+    return null;
+  }
+
+  // Cerrar sesión
+  logout(): void {
+    // Llamamos al backend para eliminar la cookie y luego limpiamos el localStorage
+    this.httpClient.get(`${this.apiUrl}/auth/logout`, { withCredentials: true }).subscribe({
+      next: () => {
+        // Eliminamos los datos locales
+        localStorage.removeItem('token');
+        localStorage.removeItem('user');
+        sessionStorage.clear(); // Limpiamos el sessionStorage
+        this.currentUser = null;
+        // Redirigimos al usuario
+        this.router.navigate(['/']);
+      },
+      error: (err) => {
+        console.error("Error durante el logout:", err);
       }
-      return null;
-    }
-
-
-  /*getFullName(): string {
-    if (this.currentUser) {
-      const name = this.currentUser.name || 'Invitado';
-      const surname = this.currentUser.surname || '';
-      return `${name} ${surname}`.trim();
-    }
-    return 'Invitado';
-  }*/
-
-  /*logout(): void {
-    
-    localStorage.removeItem('token');
-    localStorage.removeItem('user');
-    this.currentUser = null;
-    //////////////////////////
-  //  this.setGuestRole(); // Asegúrate de que se ejecute para configurar al usuario como "guest"
-    this.router.navigate(['/']); // Redirige al home
-  }*/
-
-    logout(): void {
-      // Llamamos al backend para eliminar la cookie y luego limpiamos el localStorage
-      this.httpClient.get(`${this.apiUrl}/auth/logout`, { withCredentials: true }).subscribe({
-        next: () => {
-          // Eliminamos los datos locales
-          localStorage.removeItem('token');
-          localStorage.removeItem('user');
-          this.currentUser = null;
-          // Redirigimos al usuario
-          this.router.navigate(['/']);
-        },
-        error: (err) => {
-          console.error("Error durante el logout:", err);
-        }
-      });
-    }
-    
-
-  setGuestRole(): void {
-    const guestUser: User = {
-      id_user: 0,
-      email: 'guest@example.com',
-      role: 'guest',
-      // name: 'Guest',
-      //surname: 'User'
-      username: 'Guest'
-    };
-    this.currentUser = guestUser;
-    localStorage.setItem('user', JSON.stringify(guestUser));
+    });
   }
 }

@@ -140,8 +140,10 @@ import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
 
 // Obtener detalles del usuario autenticado
+/*
+/////////////////////////////////////////////
 export const getUser = async (req, res) => {
-  try {
+  try { 
     const user_data = {
       id_user: req.user.id_user,
       email: req.user.email,
@@ -162,6 +164,38 @@ export const getUser = async (req, res) => {
     res.status(500).json({
       code: -100,
       message: 'An error occurred while obtaining the USER'
+    });
+  }
+};*/
+
+
+// Obtener detalles del usuario autenticado
+export const getUser = async (req, res) => {
+  try {
+    if (!req.user) {
+      return res.status(403).json({ message: "No se ha encontrado el usuario" });
+    }
+
+    const user_data = {
+      id_user: req.user.id_user,
+      email: req.user.email,
+      username: req.user.username, 
+      avatar: req.user.avatar,
+      roles: req.user.roles,
+      created_at: req.user.created_at,
+      updated_at: req.user.updated_at,
+    };
+
+    res.status(200).json({
+      code: 1,
+      message: 'User Detail',
+      data: user_data 
+    });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({
+      code: -100,
+      message: 'Error al obtener los detalles del usuario',
     });
   }
 };

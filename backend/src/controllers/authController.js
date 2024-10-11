@@ -64,7 +64,7 @@ export const register = async (req, res) => {
     const token = serialize("token", accessToken, {
       httpOnly: true,
       secure: process.env.NODE_ENV === "production",
-      sameSite: "strict",
+      sameSite: "lax",
       maxAge: 60 * 60 * 24 * 30,
       path: "/",
     });
@@ -109,6 +109,10 @@ export const login = async (req, res) => {
         expiresIn: "1h",
       }
     );
+    console.log("JWT_SECRET en el login:", process.env.JWT_SECRET);
+
+    console.log("ID del usuario antes de generar el token:", user.id_user);  // Verificar si el ID está vacío
+    console.log("Token generado:", accessToken);
     console.log("Datos del usuario antes de generar el token:", user);
     // Serializar la cookie
     const token_jwt = serialize("token", accessToken, {
@@ -302,4 +306,15 @@ export const logout = async (req, res) => {
     code: 0,
     message: "Logged out - Delete Token",
   });
+};
+
+
+export const checkAuth = async (req, res) => {
+  try {
+    // Si el middleware de autenticación pasa, el usuario está autenticado
+    res.status(200).json({ isLoggedIn: true });
+  } catch (error) {
+    console.error(error);
+    res.status(401).json({ isLoggedIn: false });
+  }
 };
