@@ -5,11 +5,14 @@ import { eventValidator } from '../validations/eventValidation.js'; // Validaci�
 
 const router = Router();
 
-// Rutas protegidas por autenticación
-router.get('/', authenticateToken(['user', 'admin']), getEvents);
-router.get('/:id', authenticateToken(['user', 'admin']), getEventById);
-router.post('/', authenticateToken(['user', 'admin']), eventValidator, addEvent);
-router.put('/:id', authenticateToken(['user', 'admin']), eventValidator, updateEvent);
-router.delete('/:id', authenticateToken(['user', 'admin']), deleteEvent);
+// **Rutas para todos los usuarios autenticados** - Los usuarios logueados solo podrán ver los eventos
+router.get('/', authenticateToken(), getEvents); // Obtener todos los eventos
+router.get('/:id', authenticateToken(), getEventById); // Obtener un evento por ID
+
+// **Rutas para el administrador (que gestionará eventos desde el backend)** - Solo el admin puede agregar, actualizar o eliminar eventos
+// Estas rutas NO estarán accesibles desde el frontend, el admin gestionará esto directamente en el backend
+router.post('/', eventValidator, addEvent); // Añadir un evento
+router.put('/:id', eventValidator, updateEvent); // Actualizar un evento
+router.delete('/:id', deleteEvent); // Eliminar un evento
 
 export default router;

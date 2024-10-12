@@ -1,4 +1,5 @@
 import Ranking from "../models/rankingModel.js";
+import { validationResult } from "express-validator";
 
 // Obtener todos los rankings de un usuario
 export const getRankings = async (req, res) => {
@@ -32,6 +33,11 @@ export const addOrUpdateRanking = async (req, res) => {
   try {
     const { user_id } = req.user;
     const { recipe_id, rating } = req.body;
+    
+     // Verificar que todos los campos necesarios están presentes
+     if (!recipe_id || !rating) {
+      return res.status(400).json({ message: "Missing recipe_id or rating." });
+    }
 
     // Buscar si ya existe una valoración para esta receta y usuario
     const existingRanking = await Ranking.findOne({

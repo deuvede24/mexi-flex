@@ -9,7 +9,7 @@ import { ViewRecipeComponent } from './components/view-recipe/view-recipe.compon
 import { LoginComponent } from './components/login/login.component';
 import { RegisterComponent } from './components/register/register.component';
 import { AuthGuard } from './guards/auth.guard';
-import { ListLocationsComponent } from './components/list-locations/list-locations.component'; 
+import { ListLocationsComponent } from './components/list-locations/list-locations.component';
 import { EditLocationComponent } from './components/edit-location/edit-location.component';
 import { ListRecipesUserComponent } from './components/list-recipes-user/list-recipes-user.component';
 
@@ -25,9 +25,9 @@ export const routes: Routes = [
   { path: 'locations/edit/:id', component: EditLocationComponent, canActivate: [AuthGuard] },
   { path: 'fullcalendar', component: FullCalendarComponent, canActivate: [AuthGuard] },
   { path: 'charts', component: ChartsComponent, canActivate: [AuthGuard] },
-  
+
   // Ruta para ver la lista de recetas (sin autenticación)
-  { path: 'recipes', component: ListRecipesComponent }, 
+  { path: 'recipes', component: ListRecipesComponent },
 
   // Rutas protegidas para la administración de recetas
   { path: 'recipes/add', component: AddEditRecipeComponent, canActivate: [AuthGuard] },
@@ -36,9 +36,6 @@ export const routes: Routes = [
 
   { path: 'recipes-user', component: ListRecipesUserComponent },
   { path: 'recipes/view/:id', component: ViewRecipeComponent, canActivate: [AuthGuard] },
-
-
-  
 
   { path: '**', redirectTo: '', pathMatch: 'full' },
 ];

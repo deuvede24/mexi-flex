@@ -407,10 +407,10 @@ const insertInitialData = async () => {
     );
     const userData = [
       {
-        email: "admin@example.com",
+        email: "dani@example.com",
         password: hashedPassword,
-        username: "admin",
-        roles: "admin",
+        username: "dani",
+        roles: "user",
         avatar: null,
       },
       {
