@@ -17,7 +17,7 @@ export const register = async (req, res) => {
       return res.status(400).json({ errors: errors.array() });
     }
 
-    const { email, password, username, avatar } = req.body;
+    const { email, password, username } = req.body;
 
     const existingUser = await User.findOne({ where: { email } });
     if (existingUser) {
@@ -27,6 +27,8 @@ export const register = async (req, res) => {
     }
 
     const hashedPassword = await bcrypt.hash(password, Number(process.env.BCRYPT_SALT));
+    // Crear un avatar con DiceBear en base al username
+    const avatar = `https://avatars.dicebear.com/api/initials/${username}.svg`;
 
     const newUser = await User.create({
       email,
@@ -56,6 +58,7 @@ export const register = async (req, res) => {
         id_user: newUser.id_user,
         email: newUser.email,
         username: newUser.username,
+        avatar: newUser.avatar, // Devolver el avatar generado
       },
     });
   } catch (error) {
@@ -68,6 +71,11 @@ export const register = async (req, res) => {
 // Login
 export const login = async (req, res) => {
   try {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      return res.status(400).json({ errors: errors.array() });
+    }
+
     const { email, password } = req.body;
     const user = await User.findOne({ where: { email } });
 
@@ -97,6 +105,7 @@ export const login = async (req, res) => {
         id_user: user.id_user,
         email: user.email,
         username: user.username,
+        avatar: user.avatar, // Incluir avatar en la respuesta
       },
     });
   } catch (error) {
@@ -106,6 +115,8 @@ export const login = async (req, res) => {
 
 // Logout
 export const logout = async (req, res) => {
+  console.log('NODE_ENV:', process.env.NODE_ENV); // Aquí verificas el valor de NODE_ENV
+
   const token = serialize("token", null, {
     httpOnly: true,
     secure: process.env.NODE_ENV === 'production' ? true : false,

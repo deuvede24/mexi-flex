@@ -20,10 +20,9 @@ export class AuthService {
 
   // Registrar un usuario
   register(user: User): Observable<AuthResponse> {
-    return this.httpClient.post<AuthResponse>(`${this.apiUrl}/auth/register`, user).pipe(
+    return this.httpClient.post<AuthResponse>(`${this.apiUrl}/auth/register`, user, { withCredentials: true }).pipe(
       tap((response: AuthResponse) => {
-        localStorage.setItem('token', response.accessToken);
-        localStorage.setItem('user', JSON.stringify(response.user));
+       // localStorage.setItem('user', JSON.stringify(response.user));
         this.currentUser = response.user;
         this.router.navigate(['/']);
       })
@@ -35,8 +34,7 @@ export class AuthService {
     return this.httpClient.post<AuthResponse>(`${this.apiUrl}/auth/login`, user, { withCredentials: true }).pipe(
       tap((response: AuthResponse) => {
         console.log("Respuesta de login:", response);
-        localStorage.setItem('token', response.accessToken);
-        localStorage.setItem('user', JSON.stringify(response.user));
+      //  localStorage.setItem('user', JSON.stringify(response.user));
         this.currentUser = response.user;
       })
     );
@@ -44,45 +42,30 @@ export class AuthService {
 
   // Verificar si el usuario está logueado
   isLoggedIn(): boolean {
-    const loggedIn = !!localStorage.getItem('token');
-    console.log("¿Está logueado?", loggedIn);
-    return loggedIn;
-  }
-
-  // Verificar si el usuario es admin
-  isAdmin(): boolean {
-    const user = this.getUser();
-    return user?.id_user === 1; 
+    return !!this.currentUser;
   }
 
   // Obtener el usuario logueado del localStorage
-  getUser(): User | null {
+ /* getUser(): User | null {
     const userString = localStorage.getItem('user');
-    console.log("Usuario obtenido del localStorage:", userString);
     if (userString) {
-      try {
-        const user = JSON.parse(userString);
-        this.currentUser = user;
-        return user;
-      } catch (e) {
-        console.error("Error al parsear el usuario del localStorage:", e);
-        return null;
-      }
+      return JSON.parse(userString);
     }
     return null;
+  }*/
+
+      // Obtener el usuario logueado en la sesión actual
+  getUser(): User | null {
+    return this.currentUser;  // No usamos localStorage, solo el estado actual en memoria
   }
+
 
   // Cerrar sesión
   logout(): void {
-    // Llamamos al backend para eliminar la cookie y luego limpiamos el localStorage
     this.httpClient.get(`${this.apiUrl}/auth/logout`, { withCredentials: true }).subscribe({
       next: () => {
-        // Eliminamos los datos locales
-        localStorage.removeItem('token');
-        localStorage.removeItem('user');
-        sessionStorage.clear(); // Limpiamos el sessionStorage
+       // localStorage.removeItem('user');
         this.currentUser = null;
-        // Redirigimos al usuario
         this.router.navigate(['/']);
       },
       error: (err) => {

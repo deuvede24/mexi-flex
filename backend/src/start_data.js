@@ -403,7 +403,7 @@ const insertInitialData = async () => {
     // Usuarios iniciales
     const hashedPassword = await bcrypt.hash(
       "password123",
-      parseInt(process.env.BCRYPT_SALT)
+      parseInt(process.BCRYPT_SALT)
     );
     const userData = [
       {
